@@ -42,7 +42,6 @@ Not implemented yet:
 ## Requirements
 
 - Windows
-- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - A local Everwind install
 
 By default, the app looks for:
@@ -54,9 +53,29 @@ By default, the app looks for:
 If your game is somewhere else, drag `Everwind.exe` onto the path box in the
 trainer, or click the box and browse to it.
 
-## Build and run
+## Download
 
-From the repository root:
+Download the latest `EverwindTrainer-*-win-x64.zip` from
+[GitHub Releases](https://github.com/theper10/EverwindTrainer/releases).
+
+Extract the zip and run:
+
+```text
+Everwind.TrainerApp.exe
+```
+
+Keep the extracted folder together. The trainer needs the included
+`RuntimeProbe` folder beside the app.
+
+The release zip is self-contained, so normal users do not need to install the
+.NET SDK.
+
+## Build from source
+
+Install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0),
+then run these commands from the repository root.
+
+Build everything:
 
 ```powershell
 dotnet build .\EverwindTrainer.slnx -c Release
@@ -74,9 +93,6 @@ Run:
 tools\Everwind.TrainerApp\bin\Release\net8.0-windows\win-x64\publish\Everwind.TrainerApp.exe
 ```
 
-There is no packaged release build in this repository yet, so building from
-source is currently the normal install path.
-
 ## How to use
 
 1. Start Everwind normally with `Everwind.exe`.
@@ -86,9 +102,9 @@ source is currently the normal install path.
    `Everwind.exe`.
 5. Toggle features on or off in the trainer.
 
-The trainer UI talks to `Everwind.RuntimeProbe`, a helper executable that is
-copied beside the published app. Keep the published folder together; do not move
-only `Everwind.TrainerApp.exe` by itself.
+The trainer UI talks to `Everwind.RuntimeProbe`, a helper executable included in
+the release zip and copied beside local publish builds. Keep the folder
+together; do not move only `Everwind.TrainerApp.exe` by itself.
 
 ## Developer tools
 
