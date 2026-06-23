@@ -1,7 +1,27 @@
+# Build output
 artifacts/
-bin/
-obj/
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Local IDE/editor state
 .vs/
+.vscode/
+.idea/
 .agents/
 *.user
+*.rsuser
 *.suo
+*.userosscache
+*.sln.docstates
+
+# Local logs and temporary files
+*.log
+*.tmp
+*.bak
+*.orig
+*.binlog
