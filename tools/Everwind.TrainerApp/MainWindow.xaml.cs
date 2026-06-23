@@ -17,10 +17,17 @@ using Microsoft.Win32;
 
 public partial class MainWindow : Window
 {
-    private const char MultiplierSuffix = '×';
+    private const char MultiplierSuffix = '\u00D7';
     private const string ProbeDecimalFormat = "0.###";
     private const uint ShellIcon = 0x000000100;
     private const uint ShellLargeIcon = 0x000000000;
+    private static readonly SolidColorBrush StatusAccentBrush = CreateFrozenBrush(215, 196, 106);
+    private static readonly SolidColorBrush StatusSuccessBrush = CreateFrozenBrush(111, 185, 141);
+    private static readonly SolidColorBrush StatusWarningBrush = CreateFrozenBrush(208, 161, 90);
+    private static readonly SolidColorBrush StatusDangerBrush = CreateFrozenBrush(214, 106, 115);
+    private static readonly SolidColorBrush StatusMutedBrush = CreateFrozenBrush(133, 141, 152);
+    private static readonly SolidColorBrush DropAcceptBackgroundBrush = CreateFrozenBrush(29, 42, 56);
+    private static readonly SolidColorBrush DropRejectBackgroundBrush = CreateFrozenBrush(44, 24, 30);
     private static readonly string DefaultGameExe = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
         "games",
@@ -189,12 +196,7 @@ public partial class MainWindow : Window
 
     private void RegisterFeaturePin(string feature, Border row, StackPanel originPanel, ToggleButton pinButton)
     {
-        var binding = new FeaturePinBinding(
-            feature,
-            row,
-            originPanel,
-            originPanel.Children.IndexOf(row),
-            pinButton);
+        var binding = new FeaturePinBinding(row, originPanel, originPanel.Children.IndexOf(row), pinButton);
         _featurePins[feature] = binding;
         _featurePinsByRow[row] = binding;
     }
@@ -306,16 +308,18 @@ public partial class MainWindow : Window
 
     private void BrowseForGameExe()
     {
-        var initialDirectory = Directory.Exists(Path.GetDirectoryName(_gameExePath))
-            ? Path.GetDirectoryName(_gameExePath)
-            : Path.GetDirectoryName(DefaultGameExe);
+        var initialDirectory = FirstExistingDirectory(
+            Path.GetDirectoryName(_gameExePath),
+            Path.GetDirectoryName(DefaultGameExe),
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory));
 
         var dialog = new OpenFileDialog
         {
             Title = "Select Everwind.exe",
             Filter = "Executable (*.exe)|*.exe|All files (*.*)|*.*",
             FileName = "Everwind.exe",
-            InitialDirectory = initialDirectory ?? Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+            InitialDirectory = initialDirectory,
             CheckFileExists = true,
             Multiselect = false
         };
@@ -376,7 +380,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        await RunTrainerCommandAsync(command, "[Slot 1] Minimum Stack Size");
+        await RunTrainerCommandAsync(command);
     }
 
     private async void StepValue_Click(object sender, RoutedEventArgs e)
@@ -479,7 +483,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        await RunTrainerCommandAsync(command, $"{FeatureDisplayName(feature)} {(enabled ? "ON" : "OFF")}");
+        await RunTrainerCommandAsync(command);
     }
 
     private List<string>? BuildFeatureCommand(string feature, bool enabled, bool once = true)
@@ -645,7 +649,7 @@ public partial class MainWindow : Window
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             _maintainers[feature] = process;
-            SetActionStatus($"{FeatureDisplayName(feature)} ON — guarding", StatusKind.Success);
+            SetActionStatus($"{FeatureDisplayName(feature)} ON - guarding", StatusKind.Success);
         }
         catch (Exception exception)
         {
@@ -682,7 +686,7 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task RunTrainerCommandAsync(IReadOnlyList<string> arguments, string label)
+    private async Task RunTrainerCommandAsync(IReadOnlyList<string> arguments)
     {
         var startInfo = CreateProbeStartInfo(arguments);
         if (startInfo is null)
@@ -776,7 +780,7 @@ public partial class MainWindow : Window
         {
             e.Effects = DragDropEffects.Copy;
             GameDropZone.BorderBrush = BrushForStatus(StatusKind.Accent);
-            GameDropZone.Background = new SolidColorBrush(Color.FromRgb(29, 42, 56));
+            GameDropZone.Background = DropAcceptBackgroundBrush;
             GamePathTitleText.Text = "Release to use this EXE";
             GamePathDetailText.Text = "Trainer will remember it";
         }
@@ -784,7 +788,7 @@ public partial class MainWindow : Window
         {
             e.Effects = DragDropEffects.None;
             GameDropZone.BorderBrush = BrushForStatus(StatusKind.Danger);
-            GameDropZone.Background = new SolidColorBrush(Color.FromRgb(44, 24, 30));
+            GameDropZone.Background = DropRejectBackgroundBrush;
             GamePathTitleText.Text = "Drop an .exe file";
             GamePathDetailText.Text = "Everwind.exe recommended";
         }
@@ -1015,8 +1019,8 @@ public partial class MainWindow : Window
         var directory = Path.GetDirectoryName(path) ?? "";
         var tail = Path.Combine(Path.GetFileName(directory), fileName);
         return tail.Length + 2 <= maxLength
-            ? $"…\\{tail}"
-            : $"…\\{fileName}";
+            ? $"\u2026\\{tail}"
+            : $"\u2026\\{fileName}";
     }
 
     private ProcessStartInfo? CreateProbeStartInfo(IReadOnlyList<string> arguments)
@@ -1102,12 +1106,12 @@ public partial class MainWindow : Window
         if (gameRuntimeFound)
         {
             _launchPendingUntilUtc = DateTime.MinValue;
-            SetLaunchState("Game Running", "Connected · in game", StatusKind.Success, enabled: false);
+            SetLaunchState("Game Running", "Connected - in game", StatusKind.Success, enabled: false);
         }
         else if (topLevelFound)
         {
             _launchPendingUntilUtc = DateTime.MinValue;
-            SetLaunchState("Game Running", "Open · waiting for world", StatusKind.Warning, enabled: false);
+            SetLaunchState("Game Running", "Open - waiting for world", StatusKind.Warning, enabled: false);
         }
         else if (DateTime.UtcNow < _launchPendingUntilUtc)
         {
@@ -1176,6 +1180,19 @@ public partial class MainWindow : Window
         return !string.IsNullOrWhiteSpace(feature);
     }
 
+    private static string FirstExistingDirectory(params string?[] paths)
+    {
+        foreach (var path in paths)
+        {
+            if (!string.IsNullOrWhiteSpace(path) && Directory.Exists(path))
+            {
+                return path;
+            }
+        }
+
+        return "";
+    }
+
     private static void AddDecimalArgument(ICollection<string> arguments, TextBox valueBox, decimal fallback)
     {
         arguments.Add(ReadDecimal(valueBox, fallback).ToString(ProbeDecimalFormat, CultureInfo.InvariantCulture));
@@ -1227,17 +1244,15 @@ public partial class MainWindow : Window
         LaunchButton.IsEnabled = enabled;
     }
 
-    private static SolidColorBrush BrushForStatus(StatusKind kind)
-    {
-        return kind switch
+    private static SolidColorBrush BrushForStatus(StatusKind kind) =>
+        kind switch
         {
-            StatusKind.Success => new SolidColorBrush(Color.FromRgb(111, 185, 141)),
-            StatusKind.Warning => new SolidColorBrush(Color.FromRgb(208, 161, 90)),
-            StatusKind.Danger => new SolidColorBrush(Color.FromRgb(214, 106, 115)),
-            StatusKind.Muted => new SolidColorBrush(Color.FromRgb(133, 141, 152)),
-            _ => new SolidColorBrush(Color.FromRgb(215, 196, 106))
+            StatusKind.Success => StatusSuccessBrush,
+            StatusKind.Warning => StatusWarningBrush,
+            StatusKind.Danger => StatusDangerBrush,
+            StatusKind.Muted => StatusMutedBrush,
+            _ => StatusAccentBrush
         };
-    }
 
     private static string FeatureDisplayName(string feature) =>
         feature switch
@@ -1308,8 +1323,14 @@ public partial class MainWindow : Window
     private static string FormatMultiplier(decimal value, int decimals) =>
         $"{FormatDecimal(value, decimals)}{MultiplierSuffix}";
 
+    private static SolidColorBrush CreateFrozenBrush(byte red, byte green, byte blue)
+    {
+        var brush = new SolidColorBrush(Color.FromRgb(red, green, blue));
+        brush.Freeze();
+        return brush;
+    }
+
     private sealed record FeaturePinBinding(
-        string Feature,
         Border Row,
         StackPanel OriginPanel,
         int OriginalIndex,
@@ -1338,6 +1359,7 @@ public partial class MainWindow : Window
         public string TypeName;
     }
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
     private static extern IntPtr SHGetFileInfo(
         string path,
@@ -1346,6 +1368,7 @@ public partial class MainWindow : Window
         uint fileInfoSize,
         uint flags);
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("user32.dll")]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool DestroyIcon(IntPtr iconHandle);

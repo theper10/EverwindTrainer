@@ -45,7 +45,7 @@ if (handle.IsInvalid)
     throw new Win32Exception(Marshal.GetLastWin32Error(), "OpenProcess failed.");
 }
 
-await using var file = File.OpenRead(executable);
+using var file = File.OpenRead(executable);
 using var pe = new PEReader(file);
 var dataSection = pe.PEHeaders.SectionHeaders.FirstOrDefault(section => section.Name == ".data");
 if (dataSection.Name != ".data")
@@ -232,15 +232,15 @@ if (candidates.Count == 1 && namePoolCandidates.Count >= 1)
     if (!instancesOnly)
     {
         Console.WriteLine();
-        Console.WriteLine("Filtered UObject samples:");
+        WriteSectionTitle("Filtered UObject samples:");
         DumpMatchingObjects(handle, candidates[0], namePool);
         Console.WriteLine();
-        Console.WriteLine("Relevant Skyverse class properties:");
+        WriteSectionTitle("Relevant Skyverse class properties:");
         DumpRelevantClassProperties(handle, candidates[0], namePool);
     }
 
     Console.WriteLine();
-    Console.WriteLine("Target live instances:");
+    WriteSectionTitle("Target live instances:");
     DumpTargetInstances(handle, candidates[0], namePool, liveOnly: instancesOnly);
 }
 
@@ -474,15 +474,21 @@ static TrainerOptions ParseTrainerOptions(string[] args)
         else if (TryParseIntOption(args, ref index, "--item-amount", out var itemAmount) ||
                  TryParseIntOption(args, ref index, "--slot-amount", out itemAmount))
         {
-            if (itemAmount <= 0) options.IsValid = false;
+            if (itemAmount <= 0)
+            {
+                Console.Error.WriteLine("--item-amount/--slot-amount must be greater than zero.");
+                options.IsValid = false;
+            }
             else options.ItemAmount = itemAmount;
         }
-        else if (arg.Equals("--interval", StringComparison.OrdinalIgnoreCase) &&
-                 index + 1 < args.Length &&
-                 int.TryParse(args[index + 1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var interval))
+        else if (TryParseIntOption(args, ref index, "--interval", out var interval))
         {
-            options.IntervalMs = Math.Clamp(interval, 50, 10_000);
-            index++;
+            if (interval <= 0)
+            {
+                Console.Error.WriteLine("--interval must be greater than zero.");
+                options.IsValid = false;
+            }
+            else options.IntervalMs = Math.Clamp(interval, 50, 10_000);
         }
     }
 
@@ -500,6 +506,8 @@ static TrainerOptions ParseTrainerOptions(string[] args)
 
     return options;
 }
+
+static void WriteSectionTitle(string title) => Console.WriteLine(title);
 
 static bool TryParseFloatOption(string[] args, ref int index, string option, out float value)
 {
@@ -2983,12 +2991,14 @@ internal static class NativeMethods
     internal const uint PageExecuteWritecopy = 0x80;
     internal const uint PageGuard = 0x100;
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern SafeProcessHandle OpenProcess(
         uint desiredAccess,
         [MarshalAs(UnmanagedType.Bool)] bool inheritHandle,
         int processId);
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool ReadProcessMemory(
@@ -2998,6 +3008,7 @@ internal static class NativeMethods
         nuint size,
         out nuint numberOfBytesRead);
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     internal static extern bool WriteProcessMemory(
@@ -3007,6 +3018,7 @@ internal static class NativeMethods
         nuint size,
         out nuint numberOfBytesWritten);
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     internal static extern nuint VirtualQueryEx(
         SafeProcessHandle process,
@@ -3030,12 +3042,13 @@ internal static class NativeMethods
 
 internal sealed class SafeProcessHandle : Microsoft.Win32.SafeHandles.SafeHandleZeroOrMinusOneIsInvalid
 {
-    private SafeProcessHandle() : base(true)
+    internal SafeProcessHandle() : base(true)
     {
     }
 
     protected override bool ReleaseHandle() => CloseHandle(handle);
 
+    [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool CloseHandle(nint handle);

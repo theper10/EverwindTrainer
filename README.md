@@ -64,9 +64,6 @@ unless you want to build the project from source.
    `Everwind.exe` into the path box.
 4. Toggle features on or off.
 
-The trainer may request Administrator permission. This is required so it can
-work with the running game process.
-
 ## Troubleshooting
 
 ### Windows warns about the app
@@ -84,6 +81,8 @@ Use the path box near the launch button to browse for `Everwind.exe`, or drag
 
 Make sure you are loaded into a world, not sitting at the main menu. Some values
 only exist after the player character has spawned.
+
+If it still does not work, close the trainer and run it again as Administrator.
 
 ## Build from source
 

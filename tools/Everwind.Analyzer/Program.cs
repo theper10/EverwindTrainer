@@ -15,7 +15,7 @@ var isRva = targetArgument.StartsWith("rva:", StringComparison.OrdinalIgnoreCase
 var needle = isRva ? null : Encoding.ASCII.GetBytes(targetArgument);
 var context = args.Length >= 3 && int.TryParse(args[2], out var parsed) ? parsed : 24;
 
-await using var stream = File.OpenRead(path);
+using var stream = File.OpenRead(path);
 using var pe = new PEReader(stream);
 var headers = pe.PEHeaders;
 var imageBase = headers.PEHeader?.ImageBase ?? throw new InvalidDataException("PE image base is unavailable.");
@@ -44,7 +44,7 @@ else
     {
         stream.Position = section.PointerToRawData;
         var bytes = new byte[section.SizeOfRawData];
-        await stream.ReadExactlyAsync(bytes);
+        stream.ReadExactly(bytes);
 
         foreach (var offset in FindAll(bytes, needle!))
         {
@@ -70,7 +70,7 @@ if (textSection.Name != ".text")
 
 stream.Position = textSection.PointerToRawData;
 var text = new byte[textSection.SizeOfRawData];
-await stream.ReadExactlyAsync(text);
+stream.ReadExactly(text);
 
 var decoder = Iced.Intel.Decoder.Create(64, new ByteArrayCodeReader(text));
 decoder.IP = imageBase + (uint)textSection.VirtualAddress;
