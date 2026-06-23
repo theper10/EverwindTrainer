@@ -54,6 +54,7 @@ public partial class MainWindow : Window
     private readonly Dictionary<string, Process> _maintainers = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, FeaturePinBinding> _featurePins = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<UIElement, FeaturePinBinding> _featurePinsByRow = new();
+    // WPF raises these toggle changes on the UI dispatcher; this only suppresses re-entrant UI events.
     private bool _suppressToggleEvents;
     private string _gameExePath = DefaultGameExe;
     private string? _probePath;
@@ -292,7 +293,7 @@ public partial class MainWindow : Window
         }
         else
         {
-            SetActionStatus("Drop an .exe file here", StatusKind.Warning);
+            ShowActionStatus("Drop an .exe file here", StatusKind.Warning);
             e.Effects = DragDropEffects.None;
         }
 
@@ -479,7 +480,7 @@ public partial class MainWindow : Window
         var command = BuildFeatureCommand(feature, enabled);
         if (command is null)
         {
-            SetActionStatus($"{FeatureDisplayName(feature)} OFF", StatusKind.Muted);
+            HideActionStatus();
             return;
         }
 
@@ -598,7 +599,7 @@ public partial class MainWindow : Window
         var command = BuildFeatureCommand(feature, enabled: true, once: false);
         if (command is null)
         {
-            SetActionStatus($"{FeatureDisplayName(feature)} unavailable", StatusKind.Danger);
+            ShowActionStatus($"{FeatureDisplayName(feature)} unavailable", StatusKind.Danger);
             return;
         }
 
@@ -627,7 +628,7 @@ public partial class MainWindow : Window
                     return;
                 }
 
-                Dispatcher.BeginInvoke(() => SetActionStatus(eventArgs.Data, StatusKind.Danger));
+                Dispatcher.BeginInvoke(() => ShowActionStatus(eventArgs.Data, StatusKind.Danger));
             };
             process.Exited += (_, _) =>
             {
@@ -639,7 +640,7 @@ public partial class MainWindow : Window
                         process.Dispose();
                         if (GetToggle(feature)?.IsChecked == true)
                         {
-                            SetActionStatus($"{FeatureDisplayName(feature)} guard stopped", StatusKind.Danger);
+                            ShowActionStatus($"{FeatureDisplayName(feature)} guard stopped", StatusKind.Danger);
                         }
                     }
                 });
@@ -649,11 +650,11 @@ public partial class MainWindow : Window
             process.BeginOutputReadLine();
             process.BeginErrorReadLine();
             _maintainers[feature] = process;
-            SetActionStatus($"{FeatureDisplayName(feature)} ON - guarding", StatusKind.Success);
+            HideActionStatus();
         }
         catch (Exception exception)
         {
-            SetActionStatus(exception.Message, StatusKind.Danger);
+            ShowActionStatus(exception.Message, StatusKind.Danger);
         }
         finally
         {
@@ -717,12 +718,12 @@ public partial class MainWindow : Window
             else
             {
                 var detail = LastMeaningfulLine(stderr) ?? LastMeaningfulLine(stdout) ?? $"exit {process.ExitCode}";
-                SetActionStatus(detail, StatusKind.Danger);
+                ShowActionStatus(detail, StatusKind.Danger);
             }
         }
         catch (Exception exception)
         {
-            SetActionStatus(exception.Message, StatusKind.Danger);
+            ShowActionStatus(exception.Message, StatusKind.Danger);
         }
         finally
         {
@@ -744,7 +745,7 @@ public partial class MainWindow : Window
                 "Everwind Trainer",
                 MessageBoxButton.OK,
                 MessageBoxImage.Warning);
-            SetActionStatus("Set the game path first", StatusKind.Warning);
+            ShowActionStatus("Set the game path first", StatusKind.Warning);
             SetLaunchState("Launch Game", "Game file not found", StatusKind.Danger, enabled: true);
             UpdateGamePathText();
             return;
@@ -758,18 +759,16 @@ public partial class MainWindow : Window
                 WorkingDirectory = Path.GetDirectoryName(gameExe) ?? "",
                 UseShellExecute = true
             };
-            Process.Start(startInfo);
+            _ = Process.Start(startInfo)
+                ?? throw new InvalidOperationException("Windows did not start the game process.");
             _launchPendingUntilUtc = DateTime.UtcNow.AddSeconds(12);
             SetLaunchState("Launching...", "Waiting for the game", StatusKind.Warning, enabled: false);
-            SetActionStatus($"Launched {Path.GetFileName(gameExe)}", StatusKind.Success);
+            HideActionStatus();
         }
         catch (Exception exception)
         {
-            SetActionStatus($"Launch failed: {exception.Message}", StatusKind.Danger);
-        }
-
-        if (_launchPendingUntilUtc == DateTime.MinValue)
-        {
+            _launchPendingUntilUtc = DateTime.MinValue;
+            ShowActionStatus($"Launch failed: {exception.Message}", StatusKind.Danger);
             RefreshStatuses();
         }
     }
@@ -823,13 +822,13 @@ public partial class MainWindow : Window
     {
         if (!File.Exists(exePath))
         {
-            SetActionStatus("That file does not exist", StatusKind.Danger);
+            ShowActionStatus("That file does not exist", StatusKind.Danger);
             return;
         }
 
         if (!Path.GetExtension(exePath).Equals(".exe", StringComparison.OrdinalIgnoreCase))
         {
-            SetActionStatus("Please choose an .exe file", StatusKind.Warning);
+            ShowActionStatus("Please choose an .exe file", StatusKind.Warning);
             return;
         }
 
@@ -839,10 +838,14 @@ public partial class MainWindow : Window
         UpdateBrandIcon();
         UpdateBackgroundImage();
 
-        var status = Path.GetFileName(exePath).Equals("Everwind.exe", StringComparison.OrdinalIgnoreCase)
-            ? StatusKind.Success
-            : StatusKind.Warning;
-        SetActionStatus($"Game path set: {Path.GetFileName(exePath)}", status);
+        if (Path.GetFileName(exePath).Equals("Everwind.exe", StringComparison.OrdinalIgnoreCase))
+        {
+            HideActionStatus();
+        }
+        else
+        {
+            ShowActionStatus("Selected file is not named Everwind.exe", StatusKind.Warning);
+        }
     }
 
     private void UpdateGamePathText()
@@ -1034,7 +1037,7 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(probePath) || !File.Exists(probePath))
         {
-            SetActionStatus("Runtime probe missing", StatusKind.Danger);
+            ShowActionStatus("Runtime probe missing", StatusKind.Danger);
             MessageBox.Show(
                 "Could not find Everwind.RuntimeProbe.exe. Build the trainer app from the project folder so it can copy the probe beside the UI.",
                 "Everwind Trainer",
@@ -1213,14 +1216,8 @@ public partial class MainWindow : Window
             : fallback;
     }
 
-    private void SetActionStatus(string text, StatusKind kind)
+    private void ShowActionStatus(string text, StatusKind kind)
     {
-        if (kind is StatusKind.Success or StatusKind.Muted)
-        {
-            HideActionStatus();
-            return;
-        }
-
         ActionStatusText.Text = text;
         var brush = BrushForStatus(kind);
         ActionStatusText.Foreground = brush;

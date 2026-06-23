@@ -251,91 +251,34 @@ static int? ResolveProcessId(string[] args)
     int? explicitProcessId = null;
     for (var index = 0; index < args.Length; index++)
     {
-        if (args[index].Equals("--pid", StringComparison.OrdinalIgnoreCase) &&
-            index + 1 < args.Length &&
-            int.TryParse(args[index + 1], out var parsedProcessId))
+        if (args[index].Equals("--pid", StringComparison.OrdinalIgnoreCase))
         {
+            if (index + 1 >= args.Length ||
+                !int.TryParse(args[index + 1], NumberStyles.Integer, CultureInfo.InvariantCulture, out var parsedProcessId))
+            {
+                Console.Error.WriteLine("Missing or invalid value for --pid.");
+                PrintUsage();
+                return null;
+            }
+
             explicitProcessId = parsedProcessId;
             index++;
             continue;
         }
 
-        if (args[index].Equals("--instances-only", StringComparison.OrdinalIgnoreCase))
+        if (TrySkipKnownArgument(args, ref index, out var isKnownArgument))
         {
             continue;
         }
 
-        if (args[index].Equals("--player-stats", StringComparison.OrdinalIgnoreCase))
+        if (isKnownArgument)
         {
-            continue;
+            PrintUsage();
+            return null;
         }
 
-        if (args[index].Equals("--inventory-slots", StringComparison.OrdinalIgnoreCase))
-        {
-            continue;
-        }
-
-        if (args[index].Equals("--player-debug", StringComparison.OrdinalIgnoreCase))
-        {
-            continue;
-        }
-
-        if (args[index].Equals("--dump-type", StringComparison.OrdinalIgnoreCase) &&
-            index + 1 < args.Length)
-        {
-            index++;
-            continue;
-        }
-
-        if (args[index].Equals("--dump-enum", StringComparison.OrdinalIgnoreCase) &&
-            index + 1 < args.Length)
-        {
-            index++;
-            continue;
-        }
-
-        if (args[index].Equals("--find-player-float", StringComparison.OrdinalIgnoreCase) &&
-            index + 1 < args.Length)
-        {
-            index++;
-            continue;
-        }
-
-        if (args[index].Equals("--train", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--infinite-health", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--infinite-stamina", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--no-durability-loss", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--disable-infinite-health", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--disable-infinite-stamina", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-damage", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-block-damage", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-xp", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-speed", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-jump", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-durability", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-player-defaults", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--reset-known-defaults", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--once", StringComparison.OrdinalIgnoreCase))
-        {
-            continue;
-        }
-
-        if (args[index].Equals("--damage", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--block-damage", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--xp", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--speed", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--jump", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--durability", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--item-amount", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--slot-amount", StringComparison.OrdinalIgnoreCase) ||
-            args[index].Equals("--interval", StringComparison.OrdinalIgnoreCase))
-        {
-            index++;
-            continue;
-        }
-
-        Console.Error.WriteLine("Usage: Everwind.RuntimeProbe [--pid <process-id>] [--instances-only] [--player-stats] [--inventory-slots] [--player-debug] [--find-player-float N] [--dump-type <name>] [--dump-enum <name>]");
-        Console.Error.WriteLine("       Everwind.RuntimeProbe --train [--infinite-health] [--infinite-stamina] [--damage N] [--block-damage N] [--xp N] [--speed N] [--jump N] [--durability N] [--item-amount N] [--no-durability-loss] [--disable-infinite-health] [--disable-infinite-stamina] [--reset-damage] [--reset-block-damage] [--reset-xp] [--reset-speed] [--reset-jump] [--reset-durability] [--reset-player-defaults] [--interval MS] [--once]");
+        Console.Error.WriteLine($"Unknown option: {args[index]}");
+        PrintUsage();
         return null;
     }
 
@@ -346,6 +289,68 @@ static int? ResolveProcessId(string[] args)
 
     using var process = FindEverwindProcess();
     return process?.Id;
+}
+
+static bool TrySkipKnownArgument(string[] args, ref int index, out bool isKnownArgument)
+{
+    var option = args[index];
+    if (IsKnownValueOption(option))
+    {
+        isKnownArgument = true;
+        if (index + 1 >= args.Length)
+        {
+            Console.Error.WriteLine($"Missing value for {option}.");
+            return false;
+        }
+
+        index++;
+        return true;
+    }
+
+    isKnownArgument = IsKnownFlag(option);
+    return isKnownArgument;
+}
+
+static bool IsKnownFlag(string option) =>
+    option.Equals("--instances-only", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--player-stats", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--inventory-slots", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--player-debug", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--train", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--infinite-health", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--infinite-stamina", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--no-durability-loss", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--disable-infinite-health", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--disable-infinite-stamina", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-damage", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-block-damage", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-xp", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-speed", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-jump", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-durability", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-player-defaults", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--reset-known-defaults", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--once", StringComparison.OrdinalIgnoreCase);
+
+static bool IsKnownValueOption(string option) =>
+    option.Equals("--pid", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--dump-type", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--dump-enum", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--find-player-float", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--damage", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--block-damage", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--xp", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--speed", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--jump", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--durability", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--item-amount", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--slot-amount", StringComparison.OrdinalIgnoreCase) ||
+    option.Equals("--interval", StringComparison.OrdinalIgnoreCase);
+
+static void PrintUsage()
+{
+    Console.Error.WriteLine("Usage: Everwind.RuntimeProbe [--pid <process-id>] [--instances-only] [--player-stats] [--inventory-slots] [--player-debug] [--find-player-float N] [--dump-type <name>] [--dump-enum <name>]");
+    Console.Error.WriteLine("       Everwind.RuntimeProbe --train [--infinite-health] [--infinite-stamina] [--damage N] [--block-damage N] [--xp N] [--speed N] [--jump N] [--durability N] [--item-amount N] [--no-durability-loss] [--disable-infinite-health] [--disable-infinite-stamina] [--reset-damage] [--reset-block-damage] [--reset-xp] [--reset-speed] [--reset-jump] [--reset-durability] [--reset-player-defaults] [--interval MS] [--once]");
 }
 
 static bool HasFlag(string[] args, string flag) =>
@@ -490,6 +495,19 @@ static TrainerOptions ParseTrainerOptions(string[] args)
             }
             else options.IntervalMs = Math.Clamp(interval, 50, 10_000);
         }
+        else
+        {
+            var skippedKnownArgument = TrySkipKnownArgument(args, ref index, out var isKnownArgument);
+            if (!skippedKnownArgument)
+            {
+                if (!isKnownArgument)
+                {
+                    Console.Error.WriteLine($"Unknown option: {arg}");
+                }
+
+                options.IsValid = false;
+            }
+        }
     }
 
     if (!options.Enabled && options.HasWriteFlags)
@@ -517,11 +535,18 @@ static bool TryParseFloatOption(string[] args, ref int index, string option, out
         return false;
     }
 
-    if (index + 1 >= args.Length ||
-        !float.TryParse(args[index + 1], NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+    if (index + 1 >= args.Length)
     {
         Console.Error.WriteLine($"Missing or invalid value for {option}.");
         value = float.NaN;
+        return true;
+    }
+
+    if (!float.TryParse(args[index + 1], NumberStyles.Float, CultureInfo.InvariantCulture, out value))
+    {
+        Console.Error.WriteLine($"Missing or invalid value for {option}.");
+        value = float.NaN;
+        index++;
         return true;
     }
 
@@ -537,11 +562,18 @@ static bool TryParseIntOption(string[] args, ref int index, string option, out i
         return false;
     }
 
-    if (index + 1 >= args.Length ||
-        !int.TryParse(args[index + 1], NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+    if (index + 1 >= args.Length)
     {
         Console.Error.WriteLine($"Missing or invalid value for {option}.");
         value = -1;
+        return true;
+    }
+
+    if (!int.TryParse(args[index + 1], NumberStyles.Integer, CultureInfo.InvariantCulture, out value))
+    {
+        Console.Error.WriteLine($"Missing or invalid value for {option}.");
+        value = -1;
+        index++;
         return true;
     }
 
@@ -690,6 +722,7 @@ static List<NamePoolCandidate> FindNamePoolsFromBlocks(
     IReadOnlyCollection<NameBlockCandidate> blocks)
 {
     var results = new List<NamePoolCandidate>();
+    var seenAddresses = new HashSet<ulong>();
     if (blocks.Count == 0)
     {
         return results;
@@ -731,7 +764,7 @@ static List<NamePoolCandidate> FindNamePoolsFromBlocks(
                 }
 
                 var address = sectionAddress + (uint)(pointerOffset - 0x10);
-                if (results.Any(existing => existing.Address == address))
+                if (!seenAddresses.Add(address))
                 {
                     continue;
                 }
@@ -752,6 +785,7 @@ static List<NamePoolCandidate> FindNamePoolsFromBlocks(
 static List<NameBlockCandidate> FindNameBlocks(SafeProcessHandle process)
 {
     var results = new List<NameBlockCandidate>();
+    var seenAddresses = new HashSet<ulong>();
     var pattern = "None"u8.ToArray();
     var address = 0UL;
     var mbiSize = (nuint)Marshal.SizeOf<NativeMethods.MemoryBasicInformation>();
@@ -815,7 +849,7 @@ static List<NameBlockCandidate> FindNameBlocks(SafeProcessHandle process)
             }
 
             var candidateAddress = baseAddress + (uint)offset;
-            if (results.Any(existing => existing.Address == candidateAddress))
+            if (!seenAddresses.Add(candidateAddress))
             {
                 continue;
             }
@@ -882,8 +916,49 @@ static bool TryDecodeFNameEntry(byte[] bytes, int offset, out string name, out i
     }
 
     var header = ReadUInt16(bytes, offset);
-    return TryDecodeFNameEntryWithLength(bytes, offset, (header & 1) != 0, header >> 1, out name, out entrySize) ||
-           TryDecodeFNameEntryWithLength(bytes, offset, (header & 1) != 0, header >> 6, out name, out entrySize);
+    var decodedWithOneBitShift = TryDecodeFNameEntryWithLength(
+        bytes,
+        offset,
+        (header & 1) != 0,
+        header >> 1,
+        out var oneBitName,
+        out var oneBitEntrySize);
+    var decodedWithSixBitShift = TryDecodeFNameEntryWithLength(
+        bytes,
+        offset,
+        (header & 1) != 0,
+        header >> 6,
+        out var sixBitName,
+        out var sixBitEntrySize);
+
+    if (decodedWithOneBitShift && decodedWithSixBitShift)
+    {
+        if (!oneBitName.Equals(sixBitName, StringComparison.Ordinal) ||
+            oneBitEntrySize != sixBitEntrySize)
+        {
+            return false;
+        }
+
+        name = oneBitName;
+        entrySize = oneBitEntrySize;
+        return true;
+    }
+
+    if (decodedWithOneBitShift)
+    {
+        name = oneBitName;
+        entrySize = oneBitEntrySize;
+        return true;
+    }
+
+    if (decodedWithSixBitShift)
+    {
+        name = sixBitName;
+        entrySize = sixBitEntrySize;
+        return true;
+    }
+
+    return false;
 }
 
 static bool TryDecodeFNameEntryWithLength(
@@ -1326,7 +1401,7 @@ static void DumpCharacterStatisticsValues(SafeProcessHandle process, ulong compo
         ("SwimmingSprintStaminaCostRate", 0x0190),
         ("DmgMultiplier", 0x0230),
         ("BlockDmgMultiplier", 0x0240),
-        ("DurablilityUsageMultiplier", 0x0248)
+        ("DurabilityUsageMultiplier", 0x0248)
     };
 
     foreach (var stat in stats)
@@ -1641,6 +1716,12 @@ static void DumpPlayerInventorySlots(
 
     var nameCache = new Dictionary<ulong, string>();
     var stride = DetectInventorySlotPointerStride(process, names, nameCache, slotsData, slotsNum);
+    if (stride <= 0)
+    {
+        Console.WriteLine("  SlotPointerStride=<unknown>");
+        return;
+    }
+
     Console.WriteLine($"  SlotPointerStride=0x{stride:X}");
 
     var printed = 0;
@@ -1649,7 +1730,7 @@ static void DumpPlayerInventorySlots(
         ulong slotAddress;
         try
         {
-            slotAddress = ReadUInt64(ReadMemory(process, slotsData + (ulong)(index * stride), 8), 0);
+            slotAddress = ReadInventorySlotPointer(process, slotsData, index, stride);
         }
         catch (Win32Exception)
         {
@@ -1983,8 +2064,8 @@ static int DetectInventorySlotPointerStride(
     ulong slotsData,
     int slotsNum)
 {
-    var bestStride = 8;
-    var bestScore = -1;
+    var bestStride = 0;
+    var bestScore = 0;
     foreach (var stride in new[] { 8, 16, 24, 32 })
     {
         var score = 0;
@@ -1992,7 +2073,7 @@ static int DetectInventorySlotPointerStride(
         {
             try
             {
-                var pointer = ReadUInt64(ReadMemory(process, slotsData + (ulong)(index * stride), 8), 0);
+                var pointer = ReadInventorySlotPointer(process, slotsData, index, stride);
                 if (IsPointer(pointer) && IsUObjectClass(process, names, nameCache, pointer, "InventorySlot"))
                 {
                     score++;
@@ -2013,6 +2094,9 @@ static int DetectInventorySlotPointerStride(
 
     return bestStride;
 }
+
+static ulong ReadInventorySlotPointer(SafeProcessHandle process, ulong slotsData, int index, int stride) =>
+    ReadUInt64(ReadMemory(process, slotsData + (ulong)(index * stride), 8), 0);
 
 static bool IsUObjectClass(
     SafeProcessHandle process,
@@ -2103,7 +2187,7 @@ static int RunExternalTrainer(
                 }
             }
 
-            ApplyTrainerOptions(process, playerStats.Address, playerStats.ActorAddress, playerInventory.Address, options, tick);
+            ApplyTrainerOptions(process, names, playerStats.Address, playerStats.ActorAddress, playerInventory.Address, options, tick);
         }
         catch (Win32Exception exception)
         {
@@ -2115,7 +2199,7 @@ static int RunExternalTrainer(
                     playerStats = refreshed;
                     try
                     {
-                        ApplyTrainerOptions(process, playerStats.Address, playerStats.ActorAddress, playerInventory.Address, options, tick);
+                        ApplyTrainerOptions(process, names, playerStats.Address, playerStats.ActorAddress, playerInventory.Address, options, tick);
                         continue;
                     }
                     catch (Win32Exception refreshedException)
@@ -2255,6 +2339,7 @@ static (ulong Address, string OuterName, ulong ActorAddress) FindPlayerStatistic
 
 static void ApplyTrainerOptions(
     SafeProcessHandle process,
+    FNamePoolReader names,
     ulong playerStats,
     ulong playerActor,
     ulong playerInventory,
@@ -2346,7 +2431,7 @@ static void ApplyTrainerOptions(
 
     if (options.ItemAmount is { } itemAmount && IsPointer(playerInventory))
     {
-        PinPlayerInventorySlotOneAmount(process, playerInventory, itemAmount);
+        PinPlayerInventorySlotOneAmount(process, names, playerInventory, itemAmount);
     }
 
     if (tick == 1 || tick % 20 == 0)
@@ -2355,7 +2440,11 @@ static void ApplyTrainerOptions(
     }
 }
 
-static void PinPlayerInventorySlotOneAmount(SafeProcessHandle process, ulong inventoryAddress, int targetAmount)
+static void PinPlayerInventorySlotOneAmount(
+    SafeProcessHandle process,
+    FNamePoolReader names,
+    ulong inventoryAddress,
+    int targetAmount)
 {
     var inventoryBytes = ReadMemory(process, inventoryAddress, 0x198);
     var slotsData = ReadUInt64(inventoryBytes, 0x188);
@@ -2365,8 +2454,16 @@ static void PinPlayerInventorySlotOneAmount(SafeProcessHandle process, ulong inv
         return;
     }
 
-    var slotAddress = ReadUInt64(ReadMemory(process, slotsData, 8), 0);
-    if (!IsPointer(slotAddress))
+    var nameCache = new Dictionary<ulong, string>();
+    var stride = DetectInventorySlotPointerStride(process, names, nameCache, slotsData, slotsNum);
+    if (stride <= 0)
+    {
+        return;
+    }
+
+    var slotAddress = ReadInventorySlotPointer(process, slotsData, 0, stride);
+    if (!IsPointer(slotAddress) ||
+        !IsUObjectClass(process, names, nameCache, slotAddress, "InventorySlot"))
     {
         return;
     }
@@ -2393,8 +2490,8 @@ static void ResetKnownPlayerDefaults(SafeProcessHandle process, ulong playerStat
 {
     SetRangedStatisticFreezeRule(process, playerStats, 0x00F0, 0); // Hp FreezeRule
     SetRangedStatisticFreezeRule(process, playerStats, 0x00F8, 0); // Stamina FreezeRule
-    SetStatisticCurrentToBase(process, playerStats, 0x00F0, "Hp");
-    SetStatisticCurrentToBase(process, playerStats, 0x00F8, "Stamina");
+    SetStatisticCurrentToBase(process, playerStats, 0x00F0);
+    SetStatisticCurrentToBase(process, playerStats, 0x00F8);
     SetStatisticAbsolute(process, playerStats, 0x0120, 1.0f, writeBase: true); // XPGain
     SetStatisticAbsolute(process, playerStats, 0x0168, 0.0f, writeBase: true); // JumpStaminaCost
     SetStatisticAbsolute(process, playerStats, 0x0170, 1.0f, writeBase: true); // JumpBoost
@@ -2408,7 +2505,7 @@ static void ResetKnownPlayerDefaults(SafeProcessHandle process, ulong playerStat
     SetStatisticAbsolute(process, playerStats, 0x01B8, 100.0f, writeBase: true); // SwimmingMaxSpeed
     SetStatisticAbsolute(process, playerStats, 0x0230, 1.0f, writeBase: true); // DmgMultiplier
     SetStatisticAbsolute(process, playerStats, 0x0240, 1.0f, writeBase: true); // BlockDmgMultiplier
-    SetStatisticAbsolute(process, playerStats, 0x0248, 1.0f, writeBase: true); // DurablilityUsageMultiplier
+    SetStatisticAbsolute(process, playerStats, 0x0248, 1.0f, writeBase: true); // DurabilityUsageMultiplier
 }
 
 static void DisableStaminaCosts(SafeProcessHandle process, ulong playerStats)
@@ -2524,7 +2621,7 @@ static RangedStatisticSnapshot ReadRangedStatistic(SafeProcessHandle process, ul
         bytes[0xE9]);
 }
 
-static void SetStatisticCurrentToBase(SafeProcessHandle process, ulong componentAddress, int statPointerOffset, string label)
+static void SetStatisticCurrentToBase(SafeProcessHandle process, ulong componentAddress, int statPointerOffset)
 {
     var statisticAddress = ReadStatisticPointer(process, componentAddress, statPointerOffset);
     if (!IsPointer(statisticAddress))
@@ -2538,7 +2635,7 @@ static void SetStatisticCurrentToBase(SafeProcessHandle process, ulong component
         // RangedStatistic uses CurrentStat (+0xB4) as the live HP/stamina bar value.
         // CurrentValue/BaseValue (+0x28/+0x2C) are the stat/max values and do not
         // change when the player takes damage or spends stamina.
-        WriteFloat(process, statisticAddress + 0xB4, snapshot.Current);
+        WriteFloat(process, statisticAddress + 0xB4, snapshot.BaseValue);
         WriteFloat(process, statisticAddress + 0x28, snapshot.BaseValue);
     }
 }
@@ -2576,22 +2673,21 @@ static void SetStatisticAbsolute(
 
 static void WriteFloat(SafeProcessHandle process, ulong address, float value)
 {
-    var bytes = BitConverter.GetBytes(value);
-    if (!NativeMethods.WriteProcessMemory(
-            process,
-            (nint)address,
-            bytes,
-            (nuint)bytes.Length,
-            out var written) ||
-        written != (nuint)bytes.Length)
-    {
-        throw new Win32Exception(Marshal.GetLastWin32Error(), $"WriteProcessMemory failed at 0x{address:X}.");
-    }
+    WriteBytes(process, address, BitConverter.GetBytes(value));
 }
 
 static void WriteInt32(SafeProcessHandle process, ulong address, int value)
 {
-    var bytes = BitConverter.GetBytes(value);
+    WriteBytes(process, address, BitConverter.GetBytes(value));
+}
+
+static void WriteByte(SafeProcessHandle process, ulong address, byte value)
+{
+    WriteBytes(process, address, [value]);
+}
+
+static void WriteBytes(SafeProcessHandle process, ulong address, byte[] bytes)
+{
     if (!NativeMethods.WriteProcessMemory(
             process,
             (nint)address,
@@ -2602,20 +2698,11 @@ static void WriteInt32(SafeProcessHandle process, ulong address, int value)
     {
         throw new Win32Exception(Marshal.GetLastWin32Error(), $"WriteProcessMemory failed at 0x{address:X}.");
     }
-}
 
-static void WriteByte(SafeProcessHandle process, ulong address, byte value)
-{
-    var bytes = new[] { value };
-    if (!NativeMethods.WriteProcessMemory(
-            process,
-            (nint)address,
-            bytes,
-            (nuint)bytes.Length,
-            out var written) ||
-        written != (nuint)bytes.Length)
+    var confirmed = ReadMemory(process, address, bytes.Length);
+    if (!confirmed.SequenceEqual(bytes))
     {
-        throw new Win32Exception(Marshal.GetLastWin32Error(), $"WriteProcessMemory failed at 0x{address:X}.");
+        throw new Win32Exception(0, $"Write validation failed at 0x{address:X}.");
     }
 }
 
@@ -2734,7 +2821,6 @@ static string ResolveObjectName(
     }
     catch (Win32Exception)
     {
-        cache[objectAddress] = "";
         return "";
     }
 }
