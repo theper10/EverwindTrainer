@@ -1,20 +1,29 @@
 # Everwind Trainer
 
-A Windows trainer for **Everwind** with a modern WPF interface and external
-process-memory helper. It is built around a simple idea: run Everwind normally,
-open the trainer, then toggle the features you want.
+A community Windows trainer for **Everwind** with a modern desktop UI.
 
-The trainer is external-only. It does not install mods, inject UE4SS, or copy
-files into the Everwind game folder.
+Download the release zip, extract it, start Everwind, then open the trainer and
+toggle the features you want.
 
-## Important notes
+## Download
 
-- Use this only in single-player or private, host-controlled sessions.
-- Start the game with the normal `Everwind.exe`.
-- Do not start the game from `Everwind-Win64-Shipping.exe` directly.
-- The trainer requests Administrator permission so Windows allows it to read and
-  write the running game process.
-- This project does not include Everwind itself.
+Get the latest Windows build from
+[GitHub Releases](https://github.com/theper10/EverwindTrainer/releases).
+
+Download:
+
+```text
+EverwindTrainer-*-win-x64.zip
+```
+
+Extract the zip and run:
+
+```text
+Everwind.TrainerApp.exe
+```
+
+Keep the extracted folder together. The trainer needs the included
+`RuntimeProbe` folder beside the app.
 
 ## Features
 
@@ -28,8 +37,8 @@ files into the Everwind game folder.
 - Infinite durability
 - Durability loss-rate multiplier
 - `[Slot 1] Minimum Stack Size`
-- Collapsible pinned-feature section
-- Launch-game button with drag-and-drop path selection
+- Pinned favorites section
+- Game launcher with drag-and-drop path selection
 
 Not implemented yet:
 
@@ -41,34 +50,40 @@ Not implemented yet:
 
 ## Requirements
 
-- Windows
+- Windows x64
 - A local Everwind install
 
-By default, the app looks for:
+The release build is self-contained, so you do not need to install the .NET SDK
+unless you want to build the project from source.
 
-```text
-%USERPROFILE%\Documents\games\Everwind\Everwind.exe
-```
+## How to use
 
-If your game is somewhere else, drag `Everwind.exe` onto the path box in the
-trainer, or click the box and browse to it.
+1. Start Everwind and load into a world.
+2. Open `Everwind.TrainerApp.exe`.
+3. If the trainer does not find the game automatically, click or drag your
+   `Everwind.exe` into the path box.
+4. Toggle features on or off.
 
-## Download
+The trainer may request Administrator permission. This is required so it can
+work with the running game process.
 
-Download the latest `EverwindTrainer-*-win-x64.zip` from
-[GitHub Releases](https://github.com/theper10/EverwindTrainer/releases).
+## Troubleshooting
 
-Extract the zip and run:
+### Windows warns about the app
 
-```text
-Everwind.TrainerApp.exe
-```
+The trainer is not code-signed, so Windows SmartScreen may warn the first time
+you run it. If you built or downloaded it from this repository, choose the option
+to run it anyway.
 
-Keep the extracted folder together. The trainer needs the included
-`RuntimeProbe` folder beside the app.
+### The trainer cannot find Everwind
 
-The release zip is self-contained, so normal users do not need to install the
-.NET SDK.
+Use the path box near the launch button to browse for `Everwind.exe`, or drag
+`Everwind.exe` onto it.
+
+### Features do not apply
+
+Make sure you are loaded into a world, not sitting at the main menu. Some values
+only exist after the player character has spawned.
 
 ## Build from source
 
@@ -87,67 +102,17 @@ Publish the desktop app:
 dotnet publish .\tools\Everwind.TrainerApp\Everwind.TrainerApp.csproj -c Release -r win-x64 --self-contained false
 ```
 
-Run:
+Run the published app:
 
 ```text
 tools\Everwind.TrainerApp\bin\Release\net8.0-windows\win-x64\publish\Everwind.TrainerApp.exe
 ```
-
-## How to use
-
-1. Start Everwind normally with `Everwind.exe`.
-2. Load into a world.
-3. Open `Everwind.TrainerApp.exe`.
-4. If the trainer does not find the game automatically, select or drag in your
-   `Everwind.exe`.
-5. Toggle features on or off in the trainer.
-
-The trainer UI talks to `Everwind.RuntimeProbe`, a helper executable included in
-the release zip and copied beside local publish builds. Keep the folder
-together; do not move only `Everwind.TrainerApp.exe` by itself.
-
-## Developer tools
-
-### RuntimeProbe
-
-`tools/Everwind.RuntimeProbe` is the external helper used by the UI. It is
-read-only unless `--train` is passed.
-
-Read-only examples:
-
-```powershell
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --instances-only
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --player-stats
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --inventory-slots
-```
-
-Trainer examples:
-
-```powershell
-# Guard health and stamina until Ctrl+C
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --infinite-health --infinite-stamina --interval 250
-
-# Apply multipliers once
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --damage 5 --block-damage 10 --xp 3 --once
-
-# Movement/jump + no durability loss
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --speed 1.5 --jump 2 --no-durability-loss
-
-# Raise only inventory slot 1 to at least 99 items once
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --item-amount 99 --once
-```
-
-### Analyzer
-
-`tools\Everwind.Analyzer` is a small development utility for inspecting nearby
-instructions in game executables while researching offsets. Normal trainer users
-do not need it.
 
 ## Project layout
 
 ```text
 tools/
   Everwind.TrainerApp/     WPF desktop app
-  Everwind.RuntimeProbe/   External probe/trainer helper
+  Everwind.RuntimeProbe/   Runtime helper used by the UI
   Everwind.Analyzer/       Developer analysis utility
 ```
