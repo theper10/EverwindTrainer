@@ -17,6 +17,8 @@ using Microsoft.Win32;
 
 public partial class MainWindow : Window
 {
+    private const char MultiplierSuffix = '×';
+    private const string ProbeDecimalFormat = "0.###";
     private const uint ShellIcon = 0x000000100;
     private const uint ShellLargeIcon = 0x000000000;
     private static readonly string DefaultGameExe = Path.Combine(
@@ -398,7 +400,9 @@ public partial class MainWindow : Window
         var feature = parts[5];
         var value = ReadDecimal(box, fallback: 0M);
         value = Math.Min(maximum, Math.Max(minimum, value + step));
-        box.Text = FormatDecimal(value, decimals) + (IsMultiplierFeature(feature) ? "×" : "");
+        box.Text = IsMultiplierFeature(feature)
+            ? FormatMultiplier(value, decimals)
+            : FormatDecimal(value, decimals);
 
         if (IsFeatureToggleOn(feature))
         {
@@ -416,12 +420,7 @@ public partial class MainWindow : Window
 
         if (IsMultiplierFeature(feature))
         {
-            var parts = tag.Split('|');
-            var fallback = parts.Length > 1 &&
-                           decimal.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var defaultValue)
-                ? defaultValue
-                : 1M;
-            box.Text = $"{FormatDecimal(ReadDecimal(box, fallback), 2)}×";
+            NormalizeMultiplierValueBox(box, tag);
         }
 
         if (IsFeatureToggleOn(feature))
@@ -452,12 +451,7 @@ public partial class MainWindow : Window
         {
             if (IsMultiplierFeature(feature))
             {
-                var parts = tag.Split('|');
-                var fallback = parts.Length > 1 &&
-                               decimal.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var defaultValue)
-                    ? defaultValue
-                    : 1M;
-                box.Text = $"{FormatDecimal(ReadDecimal(box, fallback), 2)}×";
+                NormalizeMultiplierValueBox(box, tag);
             }
 
             e.Handled = true;
@@ -504,7 +498,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--damage");
-                    arguments.Add(ReadDecimal(DamageValue, 1M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, DamageValue, 1M);
                 }
                 else
                 {
@@ -515,7 +509,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--block-damage");
-                    arguments.Add(ReadDecimal(BlockDamageValue, 1M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, BlockDamageValue, 1M);
                 }
                 else
                 {
@@ -526,7 +520,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--xp");
-                    arguments.Add(ReadDecimal(XpValue, 1M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, XpValue, 1M);
                 }
                 else
                 {
@@ -537,7 +531,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--speed");
-                    arguments.Add(ReadDecimal(SpeedValue, 1.5M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, SpeedValue, 1.5M);
                 }
                 else
                 {
@@ -548,7 +542,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--jump");
-                    arguments.Add(ReadDecimal(JumpValue, 2M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, JumpValue, 2M);
                 }
                 else
                 {
@@ -562,7 +556,7 @@ public partial class MainWindow : Window
                 if (enabled)
                 {
                     arguments.Add("--durability");
-                    arguments.Add(ReadDecimal(DurabilityValue, 1M).ToString("0.###", CultureInfo.InvariantCulture));
+                    AddDecimalArgument(arguments, DurabilityValue, 1M);
                 }
                 else
                 {
@@ -1182,6 +1176,26 @@ public partial class MainWindow : Window
         return !string.IsNullOrWhiteSpace(feature);
     }
 
+    private static void AddDecimalArgument(ICollection<string> arguments, TextBox valueBox, decimal fallback)
+    {
+        arguments.Add(ReadDecimal(valueBox, fallback).ToString(ProbeDecimalFormat, CultureInfo.InvariantCulture));
+    }
+
+    private static void NormalizeMultiplierValueBox(TextBox box, string tag)
+    {
+        var fallback = ReadFallbackFromTag(tag, 1M);
+        box.Text = FormatMultiplier(ReadDecimal(box, fallback), 2);
+    }
+
+    private static decimal ReadFallbackFromTag(string tag, decimal fallback)
+    {
+        var parts = tag.Split('|');
+        return parts.Length > 1 &&
+               decimal.TryParse(parts[1], NumberStyles.Float, CultureInfo.InvariantCulture, out var defaultValue)
+            ? defaultValue
+            : fallback;
+    }
+
     private void SetActionStatus(string text, StatusKind kind)
     {
         if (kind is StatusKind.Success or StatusKind.Muted)
@@ -1276,7 +1290,7 @@ public partial class MainWindow : Window
     }
 
     private static string StripMultiplierSuffix(string text) =>
-        text.Trim().TrimEnd('×', 'x', 'X').Trim();
+        text.Trim().TrimEnd(MultiplierSuffix, 'x', 'X').Trim();
 
     private static bool IsMultiplierFeature(string feature) =>
         feature is "damage" or "blockDamage" or "xp" or "speed" or "jump" or "durability";
@@ -1290,6 +1304,9 @@ public partial class MainWindow : Window
 
         return value.ToString("0." + new string('#', decimals), CultureInfo.InvariantCulture);
     }
+
+    private static string FormatMultiplier(decimal value, int decimals) =>
+        $"{FormatDecimal(value, decimals)}{MultiplierSuffix}";
 
     private sealed record FeaturePinBinding(
         string Feature,

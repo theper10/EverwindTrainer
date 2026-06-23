@@ -7,28 +7,31 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
-  <Target Name="BuildRuntimeProbe" BeforeTargets="Build;Publish">
-    <MSBuild Projects="..\Everwind.RuntimeProbe\Everwind.RuntimeProbe.csproj"
-             Targets="Build"
-             RemoveProperties="RuntimeIdentifier;SelfContained;PublishSingleFile;PublishSelfContained"
-             Properties="Configuration=$(Configuration);TargetFramework=net8.0-windows;PlatformTarget=x64" />
-  </Target>
+  <ItemGroup>
+    <ProjectReference Include="..\Everwind.RuntimeProbe\Everwind.RuntimeProbe.csproj"
+                      ReferenceOutputAssembly="false"
+                      Private="false"
+                      PrivateAssets="all" />
+  </ItemGroup>
 
   <Target Name="CopyRuntimeProbeToOutput" AfterTargets="Build">
     <ItemGroup>
-      <RuntimeProbeFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\**\*.*" />
+      <RuntimeProbeFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(RuntimeProbeFiles)"
-          DestinationFiles="@(RuntimeProbeFiles->'$(OutDir)RuntimeProbe\%(RecursiveDir)%(Filename)%(Extension)')"
+          DestinationFiles="@(RuntimeProbeFiles->'$(OutDir)RuntimeProbe\%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
   </Target>
 
   <Target Name="CopyRuntimeProbeToPublish" AfterTargets="Publish">
     <ItemGroup>
-      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\**\*.*" />
+      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\$(RuntimeIdentifier)\*.*"
+                                Condition="'$(RuntimeIdentifier)' != ''" />
+      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\*.*"
+                                Condition="'$(RuntimeIdentifier)' == ''" />
     </ItemGroup>
     <Copy SourceFiles="@(RuntimeProbePublishFiles)"
-          DestinationFiles="@(RuntimeProbePublishFiles->'$(PublishDir)RuntimeProbe\%(RecursiveDir)%(Filename)%(Extension)')"
+          DestinationFiles="@(RuntimeProbePublishFiles->'$(PublishDir)RuntimeProbe\%(Filename)%(Extension)')"
           SkipUnchangedFiles="true" />
   </Target>
 </Project>

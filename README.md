@@ -1,126 +1,94 @@
 # Everwind Trainer
 
-Workspace for building a local Everwind trainer.
+External WPF trainer for Everwind. The trainer launches or attaches to the game,
+then uses a separate runtime probe process to apply selected single-player
+features.
 
-Current direction: **external-only trainer/probe**. The tool should attach to an
-already-running Everwind process and should not copy DLLs, mods, or config files
-into the game install.
+The current supported path is external-only: no DLL injection, no UE4SS install,
+and no files copied into the Everwind game folder.
 
-Important safety notes:
+## Safety notes
 
 - Start the game normally with:
   `%USERPROFILE%\Documents\games\Everwind\Everwind.exe`
-- Do not use the shipping executable directly for normal play/testing.
-- The old UE4SS injection installer is disabled by default because it caused
-  Everwind to crash on launch during testing.
-- Target scope is single-player and private, host-controlled sessions only.
+- Do not launch the shipping executable directly for normal play/testing.
+- Keep this to single-player or private, host-controlled sessions.
+- The trainer asks for Administrator permission because Windows requires it for
+  process-memory writes.
 
-## Current useful tool
+## Build
 
-`tools/Everwind.RuntimeProbe` is read-only by default. It does not modify the
-Everwind install, and it only writes to game memory when `--train` is explicitly
-passed. Its first job is to find Unreal runtime globals, starting with
-`GUObjectArray`, in a running Everwind process.
-
-Build it with:
+Build everything:
 
 ```powershell
-dotnet build .\tools\Everwind.RuntimeProbe\Everwind.RuntimeProbe.csproj -c Release
+dotnet build .\EverwindTrainer.slnx -c Release
 ```
 
-Run it only after Everwind has been started through `Everwind.exe`.
-
-Compact live-instance scan:
+Publish the Windows app:
 
 ```powershell
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --instances-only
+dotnet publish .\tools\Everwind.TrainerApp\Everwind.TrainerApp.csproj -c Release -r win-x64 --self-contained false
 ```
 
-Compact player-stat verification:
-
-```powershell
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --player-stats
-```
-
-Compact inventory slot verification:
-
-```powershell
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --inventory-slots
-```
-
-## Guarded external trainer mode
-
-The same executable now has an explicit `--train` mode. It still does not copy
-anything into the game install; it attaches to the already-running game process
-and writes only the selected stat values. Do not use `--train` until the
-read-only scan shows a live `BP_SkyverseCharacter_C_...` player component.
-
-## Windows UI
-
-The easier UI wrapper lives in `tools\Everwind.TrainerApp`.
-
-Build/publish it with:
-
-```powershell
-dotnet publish .\tools\Everwind.TrainerApp\Everwind.TrainerApp.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true
-```
-
-Open:
+Run the published app:
 
 ```text
 tools\Everwind.TrainerApp\bin\Release\net8.0-windows\win-x64\publish\Everwind.TrainerApp.exe
 ```
 
-The app asks for Administrator permission so Windows allows process-memory
-writes. It still uses the external RuntimeProbe helper and does not install or
-copy anything into the Everwind game folder.
+## Project layout
 
-Examples:
+- `tools/Everwind.TrainerApp` - WPF desktop UI.
+- `tools/Everwind.RuntimeProbe` - external process-memory probe/trainer helper.
+- `tools/Everwind.Analyzer` - developer utility for inspecting executable code
+  and nearby instructions while researching offsets.
+
+## Implemented trainer features
+
+- Infinite health
+- Infinite stamina
+- Player damage multiplier
+- Mining/block damage multiplier
+- XP gain multiplier
+- Movement speed multiplier
+- Jump height multiplier
+- Infinite durability
+- Durability loss-rate multiplier
+- `[Slot 1] Minimum Stack Size`
+- Pinning favorite features into a collapsible pinned section
+
+## RuntimeProbe CLI
+
+`Everwind.RuntimeProbe` is read-only unless `--train` is passed.
+
+Read-only checks:
 
 ```powershell
-# Keep health and stamina full until Ctrl+C
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --infinite-health --infinite-stamina
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --instances-only
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --player-stats
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --inventory-slots
+```
 
-# Add multipliers
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --damage 5 --block-damage 10 --xp 3
+Trainer examples:
+
+```powershell
+# Keep health and stamina guarded until Ctrl+C
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --infinite-health --infinite-stamina --interval 250
+
+# Apply multipliers once
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --damage 5 --block-damage 10 --xp 3 --once
 
 # Movement/jump + no durability loss
 .\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --speed 1.5 --jump 2 --no-durability-loss
 
-# Keep non-empty inventory slots at least at 99 items
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --item-amount 99
-
-# Put the player-facing trainer stats back to the observed safe defaults
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --reset-player-defaults --once
-
-# Re-enable normal durability usage without resetting other stats
-.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --durability 1 --once
+# Raise only inventory slot 1 to at least 99 items once
+.\tools\Everwind.RuntimeProbe\bin\Release\net8.0-windows\Everwind.RuntimeProbe.exe --train --item-amount 99 --once
 ```
 
-Current implemented external features:
-
-- Infinite health
-- Infinite stamina
-- Damage multiplier
-- Block damage multiplier
-- Experience gain multiplier
-- Movement speed multiplier
-- Jump boost multiplier
-- No durability loss via the character durability-usage stat
-- Non-empty inventory slot amount pinning with `--item-amount N`
-- Reset known player trainer stats back to the observed safe defaults
-- Set durability usage multiplier directly with `--durability N`
-
-Not implemented yet:
+## Not implemented
 
 - Invisibility
-- True one-hit kills independent of damage multiplier
+- True one-hit kills independent of the damage multiplier
 - Ignore crafting ingredients
 - Generator/crafting fuel pinning
 - Instant acceleration
-
-## Legacy / unstable files
-
-The `mod`, `runtime`, and UE4SS installer scripts are kept only as research
-artifacts. `scripts/Install.ps1` now requires `-AllowUnstableInjection` and
-should not be used for the normal trainer path.

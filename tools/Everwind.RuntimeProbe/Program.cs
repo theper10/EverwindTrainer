@@ -335,7 +335,7 @@ static int? ResolveProcessId(string[] args)
         }
 
         Console.Error.WriteLine("Usage: Everwind.RuntimeProbe [--pid <process-id>] [--instances-only] [--player-stats] [--inventory-slots] [--player-debug] [--find-player-float N] [--dump-type <name>] [--dump-enum <name>]");
-        Console.Error.WriteLine("       Everwind.RuntimeProbe --train [--infinite-health] [--infinite-stamina] [--damage N] [--block-damage N] [--xp N] [--speed N] [--jump N] [--durability N] [--item-amount N] [--no-durability-loss] [--disable-infinite-health] [--disable-infinite-stamina] [--reset-damage] [--reset-block-damage] [--reset-xp] [--reset-speed] [--reset-jump] [--reset-durability] [--reset-player-defaults] [--once]");
+        Console.Error.WriteLine("       Everwind.RuntimeProbe --train [--infinite-health] [--infinite-stamina] [--damage N] [--block-damage N] [--xp N] [--speed N] [--jump N] [--durability N] [--item-amount N] [--no-durability-loss] [--disable-infinite-health] [--disable-infinite-stamina] [--reset-damage] [--reset-block-damage] [--reset-xp] [--reset-speed] [--reset-jump] [--reset-durability] [--reset-player-defaults] [--interval MS] [--once]");
         return null;
     }
 
