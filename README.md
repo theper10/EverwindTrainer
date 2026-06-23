@@ -86,7 +86,7 @@ If it still does not work, close the trainer and run it again as Administrator.
 
 ## Build from source
 
-Install the [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0),
+Install the [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0),
 then run these commands from the repository root.
 
 Build everything:
@@ -104,7 +104,7 @@ dotnet publish .\tools\Everwind.TrainerApp\Everwind.TrainerApp.csproj -c Release
 Run the published app:
 
 ```text
-tools\Everwind.TrainerApp\bin\Release\net8.0-windows\win-x64\publish\Everwind.TrainerApp.exe
+tools\Everwind.TrainerApp\bin\Release\net10.0-windows\win-x64\publish\Everwind.TrainerApp.exe
 ```
 
 ## Project layout

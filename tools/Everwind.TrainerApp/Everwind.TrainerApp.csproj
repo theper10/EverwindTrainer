@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>$(EverwindWindowsTargetFramework)</TargetFramework>
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -16,7 +16,7 @@
 
   <Target Name="CopyRuntimeProbeToOutput" AfterTargets="Build">
     <ItemGroup>
-      <RuntimeProbeFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\*.*" />
+      <RuntimeProbeFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\$(EverwindWindowsTargetFramework)\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(RuntimeProbeFiles)"
           DestinationFiles="@(RuntimeProbeFiles->'$(OutDir)RuntimeProbe\%(Filename)%(Extension)')"
@@ -25,9 +25,9 @@
 
   <Target Name="CopyRuntimeProbeToPublish" AfterTargets="Publish">
     <ItemGroup>
-      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\$(RuntimeIdentifier)\*.*"
+      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\$(EverwindWindowsTargetFramework)\$(RuntimeIdentifier)\*.*"
                                 Condition="'$(RuntimeIdentifier)' != ''" />
-      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\*.*"
+      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\$(EverwindWindowsTargetFramework)\*.*"
                                 Condition="'$(RuntimeIdentifier)' == ''" />
     </ItemGroup>
     <Copy SourceFiles="@(RuntimeProbePublishFiles)"
