@@ -1,0 +1,1486 @@
+<Window x:Class="Everwind.TrainerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="Everwind Trainer"
+        Width="1040"
+        Height="790"
+        MinWidth="920"
+        MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
+        ResizeMode="CanResize"
+        Background="#07090D"
+        Foreground="#F1F3F5"
+        FontFamily="Segoe UI"
+        TextOptions.TextFormattingMode="Display"
+        TextOptions.TextRenderingMode="ClearType">
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="0"
+                            ResizeBorderThickness="1"
+                            CornerRadius="0"
+                            GlassFrameThickness="0"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="AccentBrush" Color="#D7C46A" />
+        <SolidColorBrush x:Key="AccentHotBrush" Color="#E8DB9A" />
+        <SolidColorBrush x:Key="AccentMutedBrush" Color="#6E6441" />
+        <SolidColorBrush x:Key="TextBrush" Color="#F1F3F5" />
+        <SolidColorBrush x:Key="SoftTextBrush" Color="#B9C0C8" />
+        <SolidColorBrush x:Key="MutedBrush" Color="#858D98" />
+        <SolidColorBrush x:Key="BorderBrushSoft" Color="#242A32" />
+        <SolidColorBrush x:Key="BorderBrushHot" Color="#3A424C" />
+        <SolidColorBrush x:Key="InputBrush" Color="#10141A" />
+        <SolidColorBrush x:Key="DangerBrush" Color="#D66A73" />
+        <SolidColorBrush x:Key="SuccessBrush" Color="#6FB98D" />
+        <SolidColorBrush x:Key="WarningBrush" Color="#D0A15A" />
+
+        <LinearGradientBrush x:Key="ChromeBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#111820" Offset="0" />
+            <GradientStop Color="#0E1218" Offset="0.65" />
+            <GradientStop Color="#0B0E13" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="CardBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#0F141A" Offset="0" />
+            <GradientStop Color="#0B0F14" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="RowBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#B010151B" Offset="0" />
+            <GradientStop Color="#940D1116" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="RowHoverBrush" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#CC151B22" Offset="0" />
+            <GradientStop Color="#B811161D" Offset="1" />
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="AccentGradientBrush" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#E1D18A" Offset="0" />
+            <GradientStop Color="#D2BD5B" Offset="1" />
+        </LinearGradientBrush>
+
+        <Style x:Key="AppFrameStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+
+        <Style x:Key="CardStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="CornerRadius" Value="0" />
+            <Setter Property="Padding" Value="18,10,18,2" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+        </Style>
+
+        <Style x:Key="FeatureRowStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="{StaticResource RowBrush}" />
+            <Setter Property="BorderBrush" Value="#7020262E" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="17" />
+            <Setter Property="Height" Value="62" />
+            <Setter Property="Padding" Value="14,0" />
+            <Setter Property="Margin" Value="0,0,0,10" />
+            <Setter Property="SnapsToDevicePixels" Value="True" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource RowHoverBrush}" />
+                    <Setter Property="BorderBrush" Value="#9A3E4855" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="FeaturePinButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="30" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="#151B23" />
+            <Setter Property="BorderBrush" Value="#252D37" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#7E8895" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="ToolTip" Value="Pin feature" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
+                            <Path x:Name="PinIcon"
+                                  Width="14"
+                                  Height="14"
+                                  Stretch="Uniform"
+                                  Fill="{TemplateBinding Foreground}"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  Data="M8,1 L14,7 L11.8,9.2 L15,12.4 L12.4,15 L9.2,11.8 L4.2,16.8 L3.2,15.8 L8.2,10.8 L5,7.6 L7.6,5 L1,3 L3,1 Z" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1E2631" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#4A5563" />
+                                <Setter Property="Foreground" Value="{StaticResource SoftTextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#3F3516" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#D7C46A" />
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                                <Setter Property="ToolTip" Value="Unpin feature" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SectionLabelStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="Foreground" Value="{StaticResource SoftTextBrush}" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="SectionHeaderBarStyle" TargetType="{x:Type Grid}">
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Margin" Value="0,0,0,14" />
+            <Setter Property="Background" Value="#3211161D" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A17202A" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SectionToggleButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="34" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+            <Setter Property="Background" Value="#131820" />
+            <Setter Property="BorderBrush" Value="#29313B" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="ToolTip" Value="Collapse section" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9">
+                            <Grid x:Name="ChevronIcon"
+                                  Width="14"
+                                  Height="14"
+                                  HorizontalAlignment="Center"
+                                  VerticalAlignment="Center"
+                                  RenderTransformOrigin="0.5,0.5">
+                                <Grid.RenderTransform>
+                                    <RotateTransform Angle="0" />
+                                </Grid.RenderTransform>
+                                <Path Data="M3,6 L7,2.5 L11,6"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="1.6"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round" />
+                                <Path Data="M3,11.5 L7,8 L11,11.5"
+                                      Stroke="{TemplateBinding Foreground}"
+                                      StrokeThickness="1.6"
+                                      StrokeStartLineCap="Round"
+                                      StrokeEndLineCap="Round"
+                                      StrokeLineJoin="Round" />
+                            </Grid>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1A212A" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#3A4654" />
+                                <Setter Property="Foreground" Value="{StaticResource AccentHotBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#222B35" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="ChevronIcon" Property="RenderTransform">
+                                    <Setter.Value>
+                                        <RotateTransform Angle="180" />
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="FeatureNameStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+        </Style>
+
+        <Style x:Key="FeatureHintStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+
+        <Style x:Key="IconBubbleStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="28" />
+            <Setter Property="Height" Value="28" />
+            <Setter Property="CornerRadius" Value="9" />
+            <Setter Property="Background" Value="#131820" />
+            <Setter Property="BorderBrush" Value="#252B34" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style x:Key="InfoBadgeStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="18" />
+            <Setter Property="Height" Value="18" />
+            <Setter Property="Margin" Value="9,0,0,0" />
+            <Setter Property="Background" Value="#453A17" />
+            <Setter Property="BorderBrush" Value="#6A5720" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="5" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="ToolTipService.InitialShowDelay" Value="120" />
+        </Style>
+
+        <Style x:Key="InfoBadgeTextStyle" TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="#F3D875" />
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="TextAlignment" Value="Center" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <Style TargetType="{x:Type ToolTip}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="HasDropShadow" Value="False" />
+            <Setter Property="Placement" Value="Mouse" />
+            <Setter Property="MaxWidth" Value="320" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToolTip}">
+                        <Border Background="#151A21"
+                                BorderBrush="#39424D"
+                                BorderThickness="1"
+                                CornerRadius="10"
+                                Padding="12,9"
+                                SnapsToDevicePixels="True">
+                            <Border.Effect>
+                                <DropShadowEffect Color="#000000"
+                                                  BlurRadius="14"
+                                                  ShadowDepth="3"
+                                                  Opacity="0.48" />
+                            </Border.Effect>
+                            <TextBlock Text="{TemplateBinding Content}"
+                                       Foreground="#E7EBF0"
+                                       FontSize="12"
+                                       FontWeight="SemiBold"
+                                       TextWrapping="Wrap"
+                                       LineHeight="18" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="StatusPillStyle" TargetType="{x:Type Border}">
+            <Setter Property="Background" Value="#101419" />
+            <Setter Property="BorderBrush" Value="#242B34" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="999" />
+            <Setter Property="Padding" Value="10,6" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+
+        <Style x:Key="DropPoolStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="238" />
+            <Setter Property="Height" Value="48" />
+            <Setter Property="Margin" Value="0,0,10,0" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Background" Value="#101419" />
+            <Setter Property="BorderBrush" Value="#2A313B" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="16" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="BorderBrush" Value="#6F6847" />
+                    <Setter Property="Background" Value="#131820" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="HeaderButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Height" Value="48" />
+            <Setter Property="MinWidth" Value="170" />
+            <Setter Property="Padding" Value="16,0" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Background" Value="#2563EB" />
+            <Setter Property="BorderBrush" Value="#2563EB" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="15">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#3478F6" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#3478F6" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1D4ED8" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#1D4ED8" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Background" Value="#1E4FAF" />
+                                <Setter TargetName="Root" Property="BorderBrush" Value="#1E4FAF" />
+                                <Setter TargetName="Root" Property="Opacity" Value="0.88" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="WindowButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="42" />
+            <Setter Property="Margin" Value="0" />
+            <Setter Property="Foreground" Value="#AEB9C6" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="shell:WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="0">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1C2734" />
+                                <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#263545" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CloseWindowButtonStyle" TargetType="{x:Type Button}" BasedOn="{StaticResource WindowButtonStyle}">
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{StaticResource DangerBrush}" />
+                    <Setter Property="Foreground" Value="White" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CleanScrollRepeatButtonStyle" TargetType="{x:Type RepeatButton}">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="IsTabStop" Value="False" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RepeatButton}">
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="CleanScrollThumbStyle" TargetType="{x:Type Thumb}">
+            <Setter Property="MinHeight" Value="42" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Thumb}">
+                        <Border x:Name="ThumbRoot"
+                                Width="5"
+                                Margin="2,6,2,6"
+                                HorizontalAlignment="Center"
+                                Background="#343D48"
+                                CornerRadius="3" />
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ThumbRoot" Property="Width" Value="7" />
+                                <Setter TargetName="ThumbRoot" Property="Background" Value="#66717E" />
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="ThumbRoot" Property="Width" Value="7" />
+                                <Setter TargetName="ThumbRoot" Property="Background" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style TargetType="{x:Type ScrollBar}">
+            <Setter Property="Width" Value="10" />
+            <Setter Property="MinWidth" Value="10" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ScrollBar}">
+                        <Grid x:Name="Root"
+                              Background="Transparent"
+                              Width="{TemplateBinding Width}">
+                            <Track x:Name="PART_Track"
+                                   IsDirectionReversed="True"
+                                   Focusable="False">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageUpCommand"
+                                                  Style="{StaticResource CleanScrollRepeatButtonStyle}" />
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource CleanScrollThumbStyle}" />
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Command="ScrollBar.PageDownCommand"
+                                                  Style="{StaticResource CleanScrollRepeatButtonStyle}" />
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1F10161E" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TrainerToggleStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Width" Value="78" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Grid Width="78" Height="34">
+                            <Border x:Name="Track"
+                                    Background="#222B35"
+                                    CornerRadius="17"
+                                    BorderBrush="#343B45"
+                                    BorderThickness="1" />
+                            <TextBlock x:Name="StateText"
+                                       Text="OFF"
+                                       FontSize="10"
+                                       FontWeight="Black"
+                                      Foreground="#8390A0"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,10,0" />
+                            <Ellipse x:Name="Thumb"
+                                     Width="22"
+                                     Height="22"
+                                     HorizontalAlignment="Left"
+                                     VerticalAlignment="Center"
+                                     Margin="7,0,0,0"
+                                     Fill="#A9B0B9" />
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Track" Property="BorderBrush" Value="#4A525D" />
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Track" Property="Background" Value="{StaticResource AccentGradientBrush}" />
+                                <Setter TargetName="Track" Property="BorderBrush" Value="#D9C977" />
+                                <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right" />
+                                <Setter TargetName="Thumb" Property="Margin" Value="0,0,7,0" />
+                                <Setter TargetName="Thumb" Property="Fill" Value="#0B0D10" />
+                                <Setter TargetName="StateText" Property="Text" Value="ON" />
+                                <Setter TargetName="StateText" Property="Foreground" Value="#0B0D10" />
+                                <Setter TargetName="StateText" Property="HorizontalAlignment" Value="Left" />
+                                <Setter TargetName="StateText" Property="Margin" Value="12,0,0,0" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ApplyActionButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="48" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Background" Value="{StaticResource AccentGradientBrush}" />
+            <Setter Property="BorderBrush" Value="#D9C977" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Foreground" Value="#0B0D10" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="17">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              RecognizesAccessKey="True" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="BorderBrush" Value="{StaticResource AccentHotBrush}" />
+                                <Setter TargetName="Root" Property="Opacity" Value="0.96" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.84" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Root" Property="Opacity" Value="0.55" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ValueStepperBorderStyle" TargetType="{x:Type Border}">
+            <Setter Property="Width" Value="130" />
+            <Setter Property="Height" Value="34" />
+            <Setter Property="Background" Value="{StaticResource InputBrush}" />
+            <Setter Property="BorderBrush" Value="#242B34" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="17" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="8,0,12,0" />
+        </Style>
+
+        <Style x:Key="ValueButtonStyle" TargetType="{x:Type Button}">
+            <Setter Property="Width" Value="31" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource MutedBrush}" />
+            <Setter Property="FontSize" Value="17" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border x:Name="Root"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="16">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#1A2028" />
+                                <Setter Property="Foreground" Value="{StaticResource AccentBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Root" Property="Background" Value="#222933" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ValueTextStyle" TargetType="{x:Type TextBox}">
+            <Setter Property="Width" Value="66" />
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource TextBrush}" />
+            <Setter Property="FontWeight" Value="Black" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Setter Property="CaretBrush" Value="{StaticResource AccentBrush}" />
+            <Setter Property="SelectionBrush" Value="#806E5B1F" />
+        </Style>
+
+        <Style x:Key="MultiplierValueTextStyle"
+               TargetType="{x:Type TextBox}"
+               BasedOn="{StaticResource ValueTextStyle}">
+            <Setter Property="Width" Value="66" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+            <EventSetter Event="GotKeyboardFocus" Handler="MultiplierValueBox_GotKeyboardFocus" />
+        </Style>
+    </Window.Resources>
+
+    <Grid ClipToBounds="True">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#080A0E" Offset="0" />
+                <GradientStop Color="#050609" Offset="1" />
+            </LinearGradientBrush>
+        </Grid.Background>
+
+        <Image x:Name="EverwindBackgroundImage"
+               Stretch="UniformToFill"
+               Opacity="0.58"
+               IsHitTestVisible="False"
+               RenderOptions.BitmapScalingMode="LowQuality"
+               Visibility="Collapsed" />
+        <Rectangle IsHitTestVisible="False"
+                   Fill="#C907090D" />
+        <Rectangle IsHitTestVisible="False">
+            <Rectangle.Fill>
+                <RadialGradientBrush Center="0.5,0.18"
+                                     GradientOrigin="0.5,0.1"
+                                     RadiusX="0.88"
+                                     RadiusY="0.7">
+                    <GradientStop Color="#18000000" Offset="0" />
+                    <GradientStop Color="#7E000000" Offset="0.72" />
+                    <GradientStop Color="#D4000000" Offset="1" />
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Border Style="{StaticResource AppFrameStyle}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0"
+                        Background="Transparent"
+                        BorderBrush="Transparent"
+                        BorderThickness="0"
+                        CornerRadius="0"
+                        Padding="56,22,56,16"
+                        Margin="0,0,0,4"
+                        MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                    <Grid>
+                        <Grid Margin="0,28,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        Margin="0,0,24,0">
+                                <Border Width="44"
+                                        Height="44"
+                                        CornerRadius="14"
+                                        Background="#141920"
+                                        BorderBrush="#2A313A"
+                                        BorderThickness="1"
+                                        Margin="0,0,14,0">
+                                    <Grid Margin="7">
+                                        <TextBlock x:Name="BrandIconFallback"
+                                                   Text="EW"
+                                                   FontSize="13"
+                                                   FontWeight="Black"
+                                                   Foreground="{StaticResource AccentBrush}"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <Image x:Name="BrandIconImage"
+                                               Stretch="Uniform"
+                                               RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                               Visibility="Collapsed" />
+                                    </Grid>
+                                </Border>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Everwind Trainer"
+                                               FontSize="31"
+                                               FontWeight="Black"
+                                               Foreground="{StaticResource TextBrush}" />
+                                </StackPanel>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        VerticalAlignment="Center"
+                                        shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                                <Border x:Name="GameDropZone"
+                                        Style="{StaticResource DropPoolStyle}"
+                                        ToolTip="Drop Everwind.exe here, or click to browse for it."
+                                        PreviewDragEnter="GameDropZone_DragEnter"
+                                        PreviewDragOver="GameDropZone_DragOver"
+                                        PreviewDrop="GameDropZone_Drop"
+                                        DragEnter="GameDropZone_DragEnter"
+                                        DragOver="GameDropZone_DragOver"
+                                        DragLeave="GameDropZone_DragLeave"
+                                        Drop="GameDropZone_Drop"
+                                        MouseLeftButtonDown="GameDropZone_MouseLeftButtonDown">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="28" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="&#x21E9;"
+                                                   Foreground="{StaticResource AccentBrush}"
+                                                   FontSize="19"
+                                                   FontWeight="Black"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <TextBlock x:Name="GamePathTitleText"
+                                                       Text="Drop Everwind.exe"
+                                                       Foreground="{StaticResource TextBrush}"
+                                                       FontSize="12"
+                                                       FontWeight="Black"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock x:Name="GamePathDetailText"
+                                                       Text="or click to browse"
+                                                       Foreground="{StaticResource MutedBrush}"
+                                                       FontSize="11"
+                                                       TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <Button x:Name="LaunchButton"
+                                        Style="{StaticResource HeaderButtonStyle}"
+                                        VerticalAlignment="Center"
+                                        Click="LaunchGame_Click">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="20" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="&#x25B6;"
+                                                   FontSize="12"
+                                                   Foreground="White"
+                                                   VerticalAlignment="Center" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <TextBlock x:Name="LaunchTitleText"
+                                                       Text="Launch Game"
+                                                       FontSize="12"
+                                                       FontWeight="Black"
+                                                       Foreground="White" />
+                                            <StackPanel Orientation="Horizontal" Margin="0,1,0,0" Visibility="Collapsed">
+                                                <TextBlock x:Name="LaunchStatusDot"
+                                                           Text="&#x25CF;"
+                                                           FontSize="7"
+                                                           Foreground="#F2C9CF"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,5,0" />
+                                                <TextBlock x:Name="LaunchStatusText"
+                                                           Text="Checking for game"
+                                                           FontSize="10"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#DCE7FF" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <Border x:Name="ActionStatusPanel"
+                                Style="{StaticResource StatusPillStyle}"
+                                HorizontalAlignment="Left"
+                                VerticalAlignment="Bottom"
+                                Margin="58,0,0,-8"
+                                Visibility="Collapsed">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock x:Name="ActionStatusDot"
+                                           Text="&#x25CF;"
+                                           Foreground="{StaticResource WarningBrush}"
+                                           FontSize="9"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,7,0" />
+                                <TextBlock x:Name="ActionStatusText"
+                                           Text=""
+                                           Foreground="{StaticResource AccentBrush}"
+                                           FontWeight="Bold"
+                                           FontSize="12" />
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Top"
+                                    Margin="0,-22,-20,0"
+                                    shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                            <Button Content="&#x2013;"
+                                    Style="{StaticResource WindowButtonStyle}"
+                                    Click="Minimize_Click" />
+                            <Button Content="&#x25A1;"
+                                    Style="{StaticResource WindowButtonStyle}"
+                                    Click="MaximizeRestore_Click" />
+                            <Button Content="&#x2715;"
+                                    Style="{StaticResource CloseWindowButtonStyle}"
+                                    Click="Close_Click" />
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <ScrollViewer Grid.Row="1"
+                              VerticalScrollBarVisibility="Auto"
+                              HorizontalScrollBarVisibility="Disabled"
+                              HorizontalContentAlignment="Center"
+                              Padding="0"
+                              Margin="0,0,2,0">
+                    <StackPanel MaxWidth="1120"
+                                HorizontalAlignment="Center">
+                        <Border x:Name="PinnedCard"
+                                Style="{StaticResource CardStyle}"
+                                Margin="0,0,0,16"
+                                Visibility="Collapsed">
+                            <StackPanel>
+                                <Grid Style="{StaticResource SectionHeaderBarStyle}"
+                                      Tag="PinnedOptionsPanel|PinnedSectionToggleButton"
+                                      MouseLeftButtonDown="SectionHeader_MouseLeftButtonDown"
+                                      ToolTip="Collapse or expand Pinned">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource IconBubbleStyle}" Background="#131820">
+                                        <Path Width="15"
+                                              Height="15"
+                                              Stretch="Uniform"
+                                              Fill="{StaticResource AccentBrush}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Data="M8,1 L10.2,5.5 L15,6.2 L11.5,9.6 L12.3,14.4 L8,12.1 L3.7,14.4 L4.5,9.6 L1,6.2 L5.8,5.5 Z" />
+                                    </Border>
+                                    <TextBlock Grid.Column="1"
+                                               Text="PINNED"
+                                               Style="{StaticResource SectionLabelStyle}"
+                                               Margin="12,0,0,0" />
+                                    <ToggleButton x:Name="PinnedSectionToggleButton"
+                                                  Grid.Column="2"
+                                                  VerticalAlignment="Center"
+                                                  Tag="PinnedOptionsPanel"
+                                                  Style="{StaticResource SectionToggleButtonStyle}"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False" />
+                                </Grid>
+
+                                <StackPanel x:Name="PinnedOptionsPanel" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <Grid Style="{StaticResource SectionHeaderBarStyle}"
+                                      Tag="PlayerOptionsPanel|PlayerSectionToggleButton"
+                                      MouseLeftButtonDown="SectionHeader_MouseLeftButtonDown"
+                                      ToolTip="Collapse or expand Player">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource IconBubbleStyle}" Background="#131820">
+                                        <Canvas Width="16" Height="16"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+                                            <Ellipse Canvas.Left="5" Canvas.Top="1"
+                                                     Width="6" Height="6"
+                                                     Fill="{StaticResource SoftTextBrush}" />
+                                            <Path Data="M2,15 C2,10.7 4.4,8.5 8,8.5 C11.6,8.5 14,10.7 14,15 Z"
+                                                  Fill="{StaticResource SoftTextBrush}" />
+                                        </Canvas>
+                                    </Border>
+                                    <TextBlock Grid.Column="1"
+                                               Text="PLAYER"
+                                               Style="{StaticResource SectionLabelStyle}"
+                                               Margin="12,0,0,0" />
+                                    <ToggleButton x:Name="PlayerSectionToggleButton"
+                                                  Grid.Column="2"
+                                                  VerticalAlignment="Center"
+                                                  Tag="PlayerOptionsPanel"
+                                                  Style="{StaticResource SectionToggleButtonStyle}"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False" />
+                                </Grid>
+
+                                <StackPanel x:Name="PlayerOptionsPanel">
+                                <Border x:Name="HealthRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Path Width="15" Height="14"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Fill="{StaticResource MutedBrush}"
+                                                  Data="M12,21.35 L10.55,20.03 C5.4,15.36 2,12.28 2,8.5 C2,5.42 4.42,3 7.5,3 C9.24,3 10.91,3.81 12,5.09 C13.09,3.81 14.76,3 16.5,3 C19.58,3 22,5.42 22,8.5 C22,12.28 18.6,15.36 13.45,20.03 Z" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Infinite Health" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Prevents your health from decreasing. Turn it off to take damage normally.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Actor-level god mode guard plus full HP backup" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <ToggleButton x:Name="InfiniteHealthToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="health" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="HealthPinButton" Grid.Column="5" Tag="health" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="StaminaRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Path Width="14" Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Fill="{StaticResource MutedBrush}"
+                                                  Data="M13,2 L4,14 L10.5,14 L9.5,22 L20,10 L13.5,10 Z" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Infinite Stamina" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Prevents stamina loss while sprinting, swimming, jumping, or using tools.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Sprint, swim, tool and jump stamina costs locked to zero" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <ToggleButton x:Name="InfiniteStaminaToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="stamina" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="StaminaPinButton" Grid.Column="5" Tag="stamina" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="DamageRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Grid Width="16" Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Path Data="M3.5,12.5 L12.5,3.5 M10.5,2.5 L13.5,2.5 L13.5,5.5 M2.5,9.5 L6.5,13.5 M2.5,13.5 L4.5,11.5"
+                                                      Stroke="{StaticResource MutedBrush}"
+                                                      StrokeThickness="1.7"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Player Damage" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Multiplies all damage you deal. 1× is normal damage.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Scale outgoing player damage" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="DamageValue|-0.5|0|1000|2|damage" Click="StepValue_Click" />
+                                                <TextBox x:Name="DamageValue" Grid.Column="1" Text="1×" Tag="damage|1" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="DamageValue|0.5|0|1000|2|damage" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="DamageToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="damage" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="DamagePinButton" Grid.Column="5" Tag="damage" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="BlockDamageRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Grid Width="16" Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Path Data="M2,5 C5,2 11,2 14,5 M8,4 L3,14 M5.5,7 L9,10.5"
+                                                      Stroke="{StaticResource MutedBrush}"
+                                                      StrokeThickness="1.7"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Mining Power" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Multiplies damage dealt to blocks and mineable objects. 1× is normal.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Scale mining and block break damage" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="BlockDamageValue|-0.5|0|1000|2|blockDamage" Click="StepValue_Click" />
+                                                <TextBox x:Name="BlockDamageValue" Grid.Column="1" Text="1×" Tag="blockDamage|1" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="BlockDamageValue|0.5|0|1000|2|blockDamage" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="BlockDamageToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="blockDamage" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="BlockDamagePinButton" Grid.Column="5" Tag="blockDamage" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,16">
+                            <StackPanel>
+                                <Grid Style="{StaticResource SectionHeaderBarStyle}"
+                                      Tag="StatsOptionsPanel|StatsSectionToggleButton"
+                                      MouseLeftButtonDown="SectionHeader_MouseLeftButtonDown"
+                                      ToolTip="Collapse or expand Stats">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource IconBubbleStyle}" Background="#131820">
+                                        <Canvas Width="15" Height="16"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center">
+                                            <Rectangle Canvas.Left="0" Canvas.Top="10"
+                                                       Width="3" Height="6"
+                                                       Fill="{StaticResource SoftTextBrush}" />
+                                            <Rectangle Canvas.Left="6" Canvas.Top="6"
+                                                       Width="3" Height="10"
+                                                       Fill="{StaticResource SoftTextBrush}" />
+                                            <Rectangle Canvas.Left="12" Canvas.Top="2"
+                                                       Width="3" Height="14"
+                                                       Fill="{StaticResource SoftTextBrush}" />
+                                        </Canvas>
+                                    </Border>
+                                    <TextBlock Grid.Column="1"
+                                               Text="STATS"
+                                               Style="{StaticResource SectionLabelStyle}"
+                                               Margin="12,0,0,0" />
+                                    <ToggleButton x:Name="StatsSectionToggleButton"
+                                                  Grid.Column="2"
+                                                  VerticalAlignment="Center"
+                                                  Tag="StatsOptionsPanel"
+                                                  Style="{StaticResource SectionToggleButtonStyle}"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False" />
+                                </Grid>
+
+                                <StackPanel x:Name="StatsOptionsPanel">
+                                <Border x:Name="XpRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Path Width="15" Height="15"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Fill="{StaticResource MutedBrush}"
+                                                  Data="M8,1 L10.15,5.35 L15,6.05 L11.5,9.45 L12.3,14.25 L8,12 L3.7,14.25 L4.5,9.45 L1,6.05 L5.85,5.35 Z" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="XP Gain" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Multiplies the XP you earn. 1× is the normal rate.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Boost experience gain" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="XpValue|-0.5|0|1000|2|xp" Click="StepValue_Click" />
+                                                <TextBox x:Name="XpValue" Grid.Column="1" Text="1×" Tag="xp|1" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="XpValue|0.5|0|1000|2|xp" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="XpToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="xp" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="XpPinButton" Grid.Column="5" Tag="xp" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="SpeedRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Grid Width="16" Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Path Data="M2,5 L7,8 L2,11 M8,5 L14,8 L8,11"
+                                                      Stroke="{StaticResource MutedBrush}"
+                                                      StrokeThickness="1.8"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Movement Speed" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Multiplies walking, sprinting, crouching, and swimming speed. 1× is normal.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Adjust walk, sprint, crouch and swim speeds" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="SpeedValue|-0.1|0.1|10|2|speed" Click="StepValue_Click" />
+                                                <TextBox x:Name="SpeedValue" Grid.Column="1" Text="1.5×" Tag="speed|1.5" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="SpeedValue|0.1|0.1|10|2|speed" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="SpeedToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="speed" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="SpeedPinButton" Grid.Column="5" Tag="speed" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="JumpRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Path Width="14" Height="15"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Fill="{StaticResource MutedBrush}"
+                                                  Data="M8,1 L14,7 L10,7 L10,15 L6,15 L6,7 L2,7 Z" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Jump Height" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Multiplies how high you jump. 1× is normal.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Absolute jump boost value, no compounding" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="JumpValue|-0.1|0.1|10|2|jump" Click="StepValue_Click" />
+                                                <TextBox x:Name="JumpValue" Grid.Column="1" Text="2×" Tag="jump|2" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="JumpValue|0.1|0.1|10|2|jump" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="JumpToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="jump" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="JumpPinButton" Grid.Column="5" Tag="jump" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardStyle}" Margin="0,0,0,8">
+                            <StackPanel>
+                                <Grid Style="{StaticResource SectionHeaderBarStyle}"
+                                      Tag="InventoryOptionsPanel|InventorySectionToggleButton"
+                                      MouseLeftButtonDown="SectionHeader_MouseLeftButtonDown"
+                                      ToolTip="Collapse or expand Inventory">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Border Style="{StaticResource IconBubbleStyle}" Background="#131820">
+                                        <Grid Width="15" Height="15"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center">
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition />
+                                            </Grid.ColumnDefinitions>
+                                            <Rectangle Margin="0,0,1.5,1.5" Fill="{StaticResource SoftTextBrush}" />
+                                            <Rectangle Grid.Column="1" Margin="1.5,0,0,1.5" Fill="{StaticResource SoftTextBrush}" />
+                                            <Rectangle Grid.Row="1" Margin="0,1.5,1.5,0" Fill="{StaticResource SoftTextBrush}" />
+                                            <Rectangle Grid.Row="1" Grid.Column="1" Margin="1.5,1.5,0,0" Fill="{StaticResource SoftTextBrush}" />
+                                        </Grid>
+                                    </Border>
+                                    <TextBlock Grid.Column="1"
+                                               Text="INVENTORY"
+                                               Style="{StaticResource SectionLabelStyle}"
+                                               Margin="12,0,0,0" />
+                                    <ToggleButton x:Name="InventorySectionToggleButton"
+                                                  Grid.Column="2"
+                                                  VerticalAlignment="Center"
+                                                  Tag="InventoryOptionsPanel"
+                                                  Style="{StaticResource SectionToggleButtonStyle}"
+                                                  IsHitTestVisible="False"
+                                                  Focusable="False" />
+                                </Grid>
+
+                                <StackPanel x:Name="InventoryOptionsPanel">
+                                <Border x:Name="NoDurabilityRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Grid Width="16" Height="16"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center">
+                                                <Path Data="M8,1.5 L14,4 V8 C14,11.5 11.7,14 8,15 C4.3,14 2,11.5 2,8 V4 Z"
+                                                      Stroke="{StaticResource MutedBrush}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeLineJoin="Round" />
+                                                <Path Data="M4.5,8 L7,10.5 L11.5,6"
+                                                      Stroke="{StaticResource MutedBrush}"
+                                                      StrokeThickness="1.5"
+                                                      StrokeStartLineCap="Round"
+                                                      StrokeEndLineCap="Round"
+                                                      StrokeLineJoin="Round" />
+                                            </Grid>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Infinite Durability" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Prevents tools and equipment from losing durability.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Keep tools and equipment from losing durability" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <ToggleButton x:Name="NoDurabilityToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="noDurability" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="NoDurabilityPinButton" Grid.Column="5" Tag="noDurability" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="DurabilityRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Path Width="15" Height="15"
+                                                  HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"
+                                                  Stretch="Uniform"
+                                                  Fill="{StaticResource MutedBrush}"
+                                                  Data="M22.7,19 L13.6,9.9 C14.5,7.6 14,4.9 12.1,3 C10.1,1 7.1,0.6 4.7,1.7 L9,6 L6,9 L1.7,4.7 C0.5,7.1 0.9,10.1 2.9,12.1 C4.8,14 7.5,14.5 9.8,13.6 L18.9,22.7 C20,23.8 21.7,23.8 22.8,22.7 C23.8,21.7 23.8,20 22.7,19 Z" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="Durability Loss Rate" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Controls how quickly durability is lost. Lower values make items last longer; 1× is normal.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Fine-tune item wear rate" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="DurabilityValue|-0.1|0|10|2|durability" Click="StepValue_Click" />
+                                                <TextBox x:Name="DurabilityValue" Grid.Column="1" Text="1×" Tag="durability|1" Style="{StaticResource MultiplierValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="DurabilityValue|0.1|0|10|2|durability" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <ToggleButton x:Name="DurabilityToggle" Grid.Column="3" HorizontalAlignment="Right" VerticalAlignment="Center" Tag="durability" Style="{StaticResource TrainerToggleStyle}" Checked="FeatureToggle_Changed" Unchecked="FeatureToggle_Changed" />
+                                        <ToggleButton x:Name="DurabilityPinButton" Grid.Column="5" Tag="durability" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+
+                                <Border x:Name="ItemAmountRow" Style="{StaticResource FeatureRowStyle}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="40" />
+                                            <ColumnDefinition Width="320" />
+                                            <ColumnDefinition Width="150" />
+                                            <ColumnDefinition Width="92" />
+                                            <ColumnDefinition Width="*" MinWidth="72" />
+                                            <ColumnDefinition Width="42" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Style="{StaticResource IconBubbleStyle}">
+                                            <Canvas Width="16" Height="16"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Center">
+                                                <Rectangle Canvas.Left="1" Canvas.Top="1.5"
+                                                           Width="10" Height="9"
+                                                           RadiusX="1.5" RadiusY="1.5"
+                                                           Stroke="{StaticResource MutedBrush}"
+                                                           StrokeThickness="1.5" />
+                                                <Rectangle Canvas.Left="5" Canvas.Top="5.5"
+                                                           Width="10" Height="9"
+                                                           RadiusX="1.5" RadiusY="1.5"
+                                                           Fill="#131820"
+                                                           Stroke="{StaticResource MutedBrush}"
+                                                           StrokeThickness="1.5" />
+                                            </Canvas>
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" ClipToBounds="True">
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="[Slot 1] Minimum Stack Size" Style="{StaticResource FeatureNameStyle}" />
+                                                <Border Style="{StaticResource InfoBadgeStyle}" ToolTip="Raises the item stack in [Slot 1] to this number once. [Slot 1] must already contain an item. Click Apply whenever you want to run it.">
+                                                    <TextBlock Text="i" Style="{StaticResource InfoBadgeTextStyle}" />
+                                                </Border>
+                                            </StackPanel>
+                                            <TextBlock Text="Raise only [Slot 1] up to this minimum" Style="{StaticResource FeatureHintStyle}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="2" Style="{StaticResource ValueStepperBorderStyle}">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="31" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="31" />
+                                                </Grid.ColumnDefinitions>
+                                                <Button Content="&#x2212;" Style="{StaticResource ValueButtonStyle}" Tag="ItemAmountValue|-1|1|9999|0|itemAmount" Click="StepValue_Click" />
+                                                <TextBox x:Name="ItemAmountValue" Grid.Column="1" Text="99" Tag="itemAmount|99" Style="{StaticResource ValueTextStyle}" LostFocus="ValueBox_LostFocus" KeyDown="ValueBox_KeyDown" />
+                                                <Button Grid.Column="2" Content="+" Style="{StaticResource ValueButtonStyle}" Tag="ItemAmountValue|1|1|9999|0|itemAmount" Click="StepValue_Click" />
+                                            </Grid>
+                                        </Border>
+                                        <Button x:Name="ItemAmountApplyButton"
+                                                Grid.Column="3"
+                                                HorizontalAlignment="Right"
+                                                VerticalAlignment="Center"
+                                                Style="{StaticResource ApplyActionButtonStyle}"
+                                                Click="ItemAmountApply_Click">
+                                            <TextBlock Text="&#x2713;"
+                                                       FontSize="16"
+                                                       FontWeight="Black"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       Margin="0,-1,0,0" />
+                                        </Button>
+                                        <ToggleButton x:Name="ItemAmountPinButton" Grid.Column="5" Tag="itemAmount" Style="{StaticResource FeaturePinButtonStyle}" Click="PinFeature_Click" />
+                                    </Grid>
+                                </Border>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

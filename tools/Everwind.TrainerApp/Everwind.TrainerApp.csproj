@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <PlatformTarget>x64</PlatformTarget>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+
+  <Target Name="BuildRuntimeProbe" BeforeTargets="Build;Publish">
+    <MSBuild Projects="..\Everwind.RuntimeProbe\Everwind.RuntimeProbe.csproj"
+             Targets="Build"
+             RemoveProperties="RuntimeIdentifier;SelfContained;PublishSingleFile;PublishSelfContained"
+             Properties="Configuration=$(Configuration);TargetFramework=net8.0-windows;PlatformTarget=x64" />
+  </Target>
+
+  <Target Name="CopyRuntimeProbeToOutput" AfterTargets="Build">
+    <ItemGroup>
+      <RuntimeProbeFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RuntimeProbeFiles)"
+          DestinationFiles="@(RuntimeProbeFiles->'$(OutDir)RuntimeProbe\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyRuntimeProbeToPublish" AfterTargets="Publish">
+    <ItemGroup>
+      <RuntimeProbePublishFiles Include="..\Everwind.RuntimeProbe\bin\$(Configuration)\net8.0-windows\**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(RuntimeProbePublishFiles)"
+          DestinationFiles="@(RuntimeProbePublishFiles->'$(PublishDir)RuntimeProbe\%(RecursiveDir)%(Filename)%(Extension)')"
+          SkipUnchangedFiles="true" />
+  </Target>
+</Project>

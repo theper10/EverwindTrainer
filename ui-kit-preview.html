@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Everwind Trainer UI Kit Preview</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --page: #080c10;
+      --ink: #edf2f7;
+      --muted: #8d98a7;
+      --line: rgba(255, 255, 255, .08);
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 10% 0%, rgba(255, 220, 68, .10), transparent 28rem),
+        radial-gradient(circle at 90% 8%, rgba(90, 160, 255, .10), transparent 30rem),
+        var(--page);
+    }
+
+    main {
+      width: min(1440px, calc(100% - 44px));
+      margin: 0 auto;
+      padding: 30px 0 44px;
+    }
+
+    header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    h1, h2, h3, p { margin: 0; }
+
+    h1 {
+      font-size: clamp(28px, 4vw, 46px);
+      letter-spacing: -.045em;
+    }
+
+    .sub {
+      margin-top: 8px;
+      color: var(--muted);
+      max-width: 760px;
+      line-height: 1.5;
+    }
+
+    .note {
+      flex: 0 0 auto;
+      border: 1px solid var(--line);
+      color: #ffe680;
+      background: rgba(255, 225, 88, .06);
+      padding: 10px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(420px, 1fr));
+      gap: 22px;
+    }
+
+    .kit {
+      min-height: 620px;
+      border: 1px solid var(--line);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .kit-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      opacity: .85;
+      margin-bottom: 12px;
+    }
+
+    .kit-title {
+      font-size: 25px;
+      letter-spacing: -.035em;
+      margin-bottom: 5px;
+    }
+
+    .kit-desc {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      margin-bottom: 18px;
+    }
+
+    .rows {
+      display: grid;
+      gap: 10px;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      min-height: 52px;
+      gap: 16px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      min-width: 0;
+    }
+
+    .bolt {
+      opacity: .5;
+      font-size: 15px;
+    }
+
+    .name {
+      font-weight: 800;
+      font-size: 14px;
+      line-height: 1.25;
+    }
+
+    .info {
+      display: inline-grid;
+      place-items: center;
+      width: 17px;
+      height: 17px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 900;
+      opacity: .72;
+      flex: 0 0 auto;
+    }
+
+    .toggle {
+      width: 64px;
+      height: 30px;
+      border-radius: 999px;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .toggle::after {
+      content: "";
+      position: absolute;
+      top: 5px;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+    }
+
+    .toggle.on::after { right: 6px; }
+    .toggle.off::after { left: 6px; }
+
+    .value {
+      display: grid;
+      grid-template-columns: 26px 68px 26px;
+      align-items: center;
+      justify-items: center;
+      height: 32px;
+      min-width: 120px;
+      overflow: hidden;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .value span:not(.number) {
+      opacity: .62;
+      font-size: 17px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 0;
+      color: inherit;
+      min-height: 38px;
+      padding: 0 16px;
+      border-radius: 12px;
+      font-weight: 900;
+      font-family: inherit;
+    }
+
+    .mock-window {
+      height: 100%;
+    }
+
+    @media (max-width: 980px) {
+      header { align-items: start; flex-direction: column; }
+      .grid { grid-template-columns: 1fr; }
+      .kit { min-height: 0; }
+    }
+
+    /* Kit 1: Shadow Ops */
+    .shadow {
+      border-radius: 26px;
+      padding: 20px;
+      background:
+        linear-gradient(180deg, rgba(25, 31, 38, .96), rgba(9, 12, 16, .98)),
+        radial-gradient(circle at 20% 0%, rgba(255, 226, 75, .13), transparent 21rem);
+      box-shadow: 0 24px 70px rgba(0,0,0,.42);
+    }
+
+    .shadow .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 18px;
+    }
+
+    .shadow .badge {
+      color: #ffde4a;
+      background: rgba(255, 222, 74, .10);
+      border: 1px solid rgba(255, 222, 74, .22);
+      padding: 7px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .shadow .group {
+      border-radius: 18px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid rgba(255,255,255,.065);
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+
+    .shadow .row {
+      border-radius: 15px;
+      padding: 0 12px;
+      background: rgba(255,255,255,.035);
+    }
+
+    .shadow .info {
+      background: #b6bcc5;
+      color: #10141a;
+    }
+
+    .shadow .toggle {
+      background: #252b33;
+    }
+
+    .shadow .toggle.on {
+      background: #ffde4a;
+    }
+
+    .shadow .toggle::after {
+      background: #b8c0ca;
+      box-shadow: 0 4px 14px rgba(0,0,0,.32);
+    }
+
+    .shadow .toggle.on::after {
+      background: #101418;
+    }
+
+    .shadow .value {
+      border-radius: 999px;
+      background: #151a20;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .shadow .primary { background: #ffde4a; color: #111; }
+    .shadow .secondary { background: #252c35; color: #eaf0f6; }
+
+    /* Kit 2: Skyglass */
+    .skyglass {
+      border-radius: 30px;
+      padding: 20px;
+      background:
+        linear-gradient(135deg, rgba(40, 80, 118, .70), rgba(17, 22, 31, .88)),
+        radial-gradient(circle at 80% 20%, rgba(91, 190, 255, .27), transparent 23rem);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 24px 70px rgba(0,0,0,.35);
+      backdrop-filter: blur(18px);
+    }
+
+    .skyglass .mock-window {
+      border-radius: 24px;
+      padding: 18px;
+      background: rgba(6, 16, 25, .42);
+      border: 1px solid rgba(175, 220, 255, .20);
+    }
+
+    .skyglass .kit-label { color: #95ddff; }
+    .skyglass .group-title {
+      color: #cbefff;
+      margin: 17px 0 10px;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+
+    .skyglass .row {
+      border-radius: 18px;
+      padding: 0 13px;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.11);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.08);
+    }
+
+    .skyglass .info {
+      background: rgba(193, 232, 255, .22);
+      color: #c9efff;
+    }
+
+    .skyglass .toggle {
+      background: rgba(11, 23, 33, .75);
+      border: 1px solid rgba(255,255,255,.13);
+    }
+
+    .skyglass .toggle.on {
+      background: linear-gradient(90deg, #6be8ff, #86ffbd);
+    }
+
+    .skyglass .toggle::after { background: #bfdff2; }
+    .skyglass .toggle.on::after { background: #06141d; }
+
+    .skyglass .value {
+      border-radius: 12px;
+      background: rgba(8, 18, 27, .70);
+      border: 1px solid rgba(255,255,255,.13);
+    }
+
+    .skyglass .primary { background: linear-gradient(90deg, #6be8ff, #86ffbd); color: #061018; }
+    .skyglass .secondary { background: rgba(255,255,255,.10); color: #e6f7ff; }
+
+    /* Kit 3: Clean Deck */
+    .clean {
+      border-radius: 18px;
+      padding: 20px;
+      background: #101419;
+      box-shadow: 0 22px 60px rgba(0,0,0,.34);
+    }
+
+    .clean .mock-window {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #0b0f13;
+      border: 1px solid #252b34;
+    }
+
+    .clean .header-strip {
+      height: 54px;
+      background: #161c23;
+      border-bottom: 1px solid #252b34;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      justify-content: space-between;
+    }
+
+    .clean .body {
+      padding: 16px;
+    }
+
+    .clean .kit-label { color: #6ee7b7; }
+
+    .clean .row {
+      min-height: 48px;
+      padding: 0 0 0 12px;
+      border-bottom: 1px solid #222932;
+    }
+
+    .clean .row:last-child { border-bottom: 0; }
+    .clean .info { background: #2d3743; color: #cfd8e3; }
+
+    .clean .toggle {
+      width: 56px;
+      height: 26px;
+      border-radius: 8px;
+      background: #222934;
+    }
+
+    .clean .toggle::after {
+      top: 4px;
+      width: 18px;
+      height: 18px;
+      border-radius: 6px;
+      background: #9ba7b5;
+    }
+
+    .clean .toggle.on {
+      background: #34d399;
+    }
+
+    .clean .toggle.on::after {
+      background: #07110d;
+    }
+
+    .clean .value {
+      border-radius: 8px;
+      background: #151b22;
+      border: 1px solid #29313b;
+    }
+
+    .clean .primary { background: #34d399; color: #05110d; border-radius: 8px; }
+    .clean .secondary { background: #202832; color: #e5edf6; border-radius: 8px; }
+
+    /* Kit 4: Arc Neon */
+    .neon {
+      border-radius: 24px;
+      padding: 20px;
+      background:
+        linear-gradient(160deg, rgba(21, 11, 37, .96), rgba(6, 9, 18, .98)),
+        radial-gradient(circle at 16% 12%, rgba(255, 73, 209, .22), transparent 18rem),
+        radial-gradient(circle at 86% 18%, rgba(0, 241, 255, .20), transparent 18rem);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.07), 0 28px 90px rgba(0,0,0,.45);
+    }
+
+    .neon .mock-window {
+      border-radius: 20px;
+      padding: 16px;
+      border: 1px solid rgba(0, 241, 255, .22);
+      box-shadow: inset 0 0 40px rgba(0, 241, 255, .045), 0 0 35px rgba(255, 73, 209, .08);
+    }
+
+    .neon .kit-label { color: #ff5ed9; }
+    .neon .kit-title { text-shadow: 0 0 18px rgba(0,241,255,.35); }
+
+    .neon .row {
+      border-radius: 16px;
+      padding: 0 12px;
+      background: rgba(255,255,255,.045);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 0 0 1px rgba(0,241,255,.035);
+    }
+
+    .neon .info {
+      background: rgba(255, 94, 217, .24);
+      color: #ffd2f5;
+    }
+
+    .neon .toggle {
+      background: rgba(255,255,255,.12);
+      box-shadow: inset 0 0 12px rgba(0,0,0,.28);
+    }
+
+    .neon .toggle.on {
+      background: linear-gradient(90deg, #ff4bd2, #00f1ff);
+      box-shadow: 0 0 18px rgba(0,241,255,.28);
+    }
+
+    .neon .toggle::after { background: #cad0ff; }
+    .neon .toggle.on::after { background: #080a13; }
+
+    .neon .value {
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(0,241,255,.22);
+    }
+
+    .neon .primary {
+      background: linear-gradient(90deg, #ff4bd2, #00f1ff);
+      color: #050712;
+      box-shadow: 0 0 22px rgba(0,241,255,.22);
+    }
+
+    .neon .secondary {
+      background: rgba(255,255,255,.08);
+      color: #f2f2ff;
+      border: 1px solid rgba(255,255,255,.10);
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <div>
+        <h1>Everwind Trainer UI Kit Preview</h1>
+        <p class="sub">Four visual directions for the trainer. These are static mockups only, so pick the vibe you want and I’ll rebuild the WinForms app around it.</p>
+      </div>
+      <div class="note">Pick 1, 2, 3, or 4</div>
+    </header>
+
+    <section class="grid">
+      <article class="kit shadow">
+        <div class="top">
+          <div>
+            <div class="kit-label">01 · Shadow Ops</div>
+            <h2 class="kit-title">Dark WeMod-ish Trainer</h2>
+            <p class="kit-desc">Closest to your reference: smoky cards, soft black rows, yellow accent toggles.</p>
+          </div>
+          <div class="badge">READY</div>
+        </div>
+
+        <div class="group">
+          <div class="kit-label">Player</div>
+          <div class="rows">
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">Infinite Health</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">Infinite Stamina</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">Damage Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">2.5</span><span>+</span></div></div>
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">Block Damage Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">1</span><span>+</span></div></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <div class="kit-label">Stats</div>
+          <div class="rows">
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">XP Gain Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">3</span><span>+</span></div></div>
+            <div class="row"><div class="feature"><span class="bolt">⚡</span><span class="name">Movement Speed</span><span class="info">i</span></div><div class="toggle off"></div></div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn primary">Apply Toggles</button>
+          <button class="btn secondary">Reset Defaults</button>
+        </div>
+      </article>
+
+      <article class="kit skyglass">
+        <div class="mock-window">
+          <div class="kit-label">02 · Skyglass</div>
+          <h2 class="kit-title">Glass Blue Adventure UI</h2>
+          <p class="kit-desc">Airy, fantasy-ish, blue glass panels with brighter readable controls.</p>
+
+          <div class="group-title">Player</div>
+          <div class="rows">
+            <div class="row"><div class="feature"><span class="bolt">✦</span><span class="name">Infinite Health</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">✦</span><span class="name">Infinite Stamina</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">✦</span><span class="name">Damage Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">2.5</span><span>+</span></div></div>
+          </div>
+
+          <div class="group-title">Inventory</div>
+          <div class="rows">
+            <div class="row"><div class="feature"><span class="bolt">✦</span><span class="name">No Durability Loss</span><span class="info">i</span></div><div class="toggle off"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">✦</span><span class="name">Keep Item Slots</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">99</span><span>+</span></div></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary">Apply Toggles</button>
+            <button class="btn secondary">Check Player</button>
+          </div>
+        </div>
+      </article>
+
+      <article class="kit clean">
+        <div class="mock-window">
+          <div class="header-strip">
+            <div>
+              <div class="kit-label">03 · Clean Deck</div>
+              <h2 class="kit-title" style="font-size:20px">Compact Utility</h2>
+            </div>
+            <button class="btn primary">Apply</button>
+          </div>
+
+          <div class="body">
+            <p class="kit-desc">Less flashy, more practical: very readable, fast, compact, and resilient in WinForms.</p>
+            <div class="rows">
+              <div class="row"><div class="feature"><span class="name">Infinite Health</span><span class="info">i</span></div><div class="toggle on"></div></div>
+              <div class="row"><div class="feature"><span class="name">Infinite Stamina</span><span class="info">i</span></div><div class="toggle on"></div></div>
+              <div class="row"><div class="feature"><span class="name">Damage Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">2.5</span><span>+</span></div></div>
+              <div class="row"><div class="feature"><span class="name">XP Gain Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">3</span><span>+</span></div></div>
+              <div class="row"><div class="feature"><span class="name">Movement Speed</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">1.5</span><span>+</span></div></div>
+              <div class="row"><div class="feature"><span class="name">No Durability Loss</span><span class="info">i</span></div><div class="toggle off"></div></div>
+            </div>
+
+            <div class="actions">
+              <button class="btn secondary">Reset Defaults</button>
+              <button class="btn secondary">Keep Running</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="kit neon">
+        <div class="mock-window">
+          <div class="kit-label">04 · Arc Neon</div>
+          <h2 class="kit-title">Cyber Neon Control Panel</h2>
+          <p class="kit-desc">More stylized and gamer-ish: glowing purple/cyan accents, high contrast, heavier personality.</p>
+
+          <div class="rows">
+            <div class="row"><div class="feature"><span class="bolt">◆</span><span class="name">Infinite Health</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">◆</span><span class="name">Infinite Stamina</span><span class="info">i</span></div><div class="toggle on"></div></div>
+            <div class="row"><div class="feature"><span class="bolt">◆</span><span class="name">Damage Multiplier</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">2.5</span><span>+</span></div></div>
+            <div class="row"><div class="feature"><span class="bolt">◆</span><span class="name">Block Damage</span><span class="info">i</span></div><div class="value"><span>−</span><span class="number">1</span><span>+</span></div></div>
+            <div class="row"><div class="feature"><span class="bolt">◆</span><span class="name">Jump Height</span><span class="info">i</span></div><div class="toggle off"></div></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn primary">Apply Toggles</button>
+            <button class="btn secondary">Open Logs</button>
+          </div>
+        </div>
+      </article>
+    </section>
+  </main>
+</body>
+</html>
